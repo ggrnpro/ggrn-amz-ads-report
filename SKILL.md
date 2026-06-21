@@ -3,7 +3,7 @@ name: amazon-ads-analyzer
 description: "Analyze Amazon advertising performance from exported reports or screenshots and produce a structured, self-contained HTML health report with a 0-100 score, a data-confidence score, benchmark comparison, prioritized findings, a search-term harvest and negatives plan, and an action plan. Use whenever the user wants to analyze, audit, review, or check Amazon Ads, Amazon PPC, Sponsored Products, Sponsored Brands, Sponsored Display, Sponsored TV, or Amazon DSP performance, understand their ACOS, TACOS, ROAS, or wasted spend, interpret an Amazon Advertising or Brand Analytics export, figure out why their Amazon ads are unprofitable, or asks 'how are my Amazon ads doing'. Also trigger when the user uploads an Amazon Search Term report, Campaign report, Targeting report, Bulk file, Business Report, Search Query Performance or Brand Analytics file, or a Helium 10 / Jungle Scout keyword export, or pastes Amazon ad metrics. Works for Amazon Seller Central and Vendor Central advertisers, brand-registered or not. Triggers in Russian too: 'проанализируй рекламу на Amazon', 'аудит рекламы Amazon', 'отчёт по рекламе Amazon', 'ACOS', 'почему реклама на Амазоне убыточна'."
 license: MIT
 metadata:
-  version: 1.0.0
+  version: 1.1.0
   author: Oleg Gagarin (https://ggrn.pro)
   domain: amazon-advertising
 ---
