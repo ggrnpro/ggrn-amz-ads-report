@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon Ads Health Report</title>
+<style>
+  /* ============================================================
+     Amazon Ads Health Report. Self-contained template.
+     The skill replaces the REPORT_DATA object (bottom of <body>)
+     with the real analysis. Everything renders from that object.
+     No external requests, so it is safe to open offline or email to a client.
+     ============================================================ */
+  :root{
+    --ink:#232F3E;        /* Amazon squid ink */
+    --ink-2:#37475A;
+    --accent:#FF9900;     /* Amazon orange */
+    --accent-2:#146EB4;   /* Amazon blue */
+    --bg:#F3F4F6;
+    --card:#FFFFFF;
+    --line:#E5E7EB;
+    --muted:#6B7280;
+    --text:#1F2937;
+    --good:#1A9E5E;  --good-bg:#E7F6EE;
+    --warn:#C77700;  --warn-bg:#FDF3E2;
+    --bad:#D7263D;   --bad-bg:#FBE9EC;
+    --crit:#B11226;
+    --info:#146EB4;  --info-bg:#E8F1FA;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(16,24,40,.06),0 4px 16px rgba(16,24,40,.06);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 24px 64px}
+  a{color:var(--accent-2)}
+
+  /* ---------- header ---------- */
+  .masthead{background:linear-gradient(135deg,var(--ink) 0%,var(--ink-2) 100%);color:#fff;border-radius:var(--radius);padding:28px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .masthead::after{content:"";position:absolute;right:-40px;top:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,153,0,.22),transparent 70%)}
+  .masthead h1{margin:0 0 4px;font-size:23px;letter-spacing:-.2px}
+  .masthead .sub{color:#C9D3DE;font-size:13.5px}
+  .brandline{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .brandline .logo{width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center;color:var(--ink);font-weight:800;font-size:16px;flex:none}
+  .metagrid{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font-size:12.5px;color:#D7DEE6}
+  .metagrid b{color:#fff;font-weight:600}
+
+  /* ---------- score hero ---------- */
+  .hero{display:grid;grid-template-columns:230px 1fr;gap:24px;margin-top:22px}
+  @media(max-width:720px){.hero{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .gauge-card{padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .gauge{position:relative;width:180px;height:180px}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .num .s{font-size:46px;font-weight:800;line-height:1;color:var(--ink)}
+  .gauge .num .o{font-size:12px;color:var(--muted)}
+  .grade-pill{margin-top:12px;font-weight:800;font-size:14px;padding:5px 16px;border-radius:999px}
+  .summary-card{padding:22px 24px}
+  .summary-card h2{margin:0 0 8px;font-size:15px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .summary-card p{margin:0;color:var(--text);font-size:14px}
+
+  /* ---------- section ---------- */
+  section{margin-top:30px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  .sec-head .ic{width:26px;height:26px;border-radius:8px;background:var(--info-bg);display:grid;place-items:center;flex:none}
+  .sec-head h2{margin:0;font-size:17px;color:var(--ink);letter-spacing:-.2px}
+  .sec-head .note{font-size:12px;color:var(--muted);margin-left:auto}
+  .sec-help{font-size:12.5px;color:var(--ink-2);margin:0 0 12px;line-height:1.5;max-width:880px}
+  .sec-help b{color:var(--ink)}
+
+  /* ---------- how to read ---------- */
+  .howto{padding:18px 22px;background:var(--info-bg);border:1px solid #CFE0F2;margin-top:22px}
+  .howto h2{margin:0 0 4px;font-size:15px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .howto .lede{font-size:13px;color:var(--ink-2);margin:0 0 10px}
+  .howto ol{margin:0;padding-left:20px}
+  .howto li{font-size:13px;color:var(--ink-2);padding:3px 0}
+  .howto li b{color:var(--ink)}
+
+  /* ---------- glossary ---------- */
+  .gloss{padding:18px 22px}
+  .gloss .g-row{display:grid;grid-template-columns:160px 1fr;gap:6px 16px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .gloss .g-row:last-child{border-bottom:0}
+  .gloss .g-term{font-weight:700;font-size:13px;color:var(--ink)}
+  .gloss .g-def{font-size:12.5px;color:var(--ink-2)}
+  @media(max-width:640px){.gloss .g-row{grid-template-columns:1fr}}
+
+  /* ---------- KPI cards ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{padding:16px 16px 14px;border-radius:12px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);position:relative}
+  .kpi .lab{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:600}
+  .kpi .val{font-size:27px;font-weight:800;color:var(--ink);margin:2px 0 2px;font-variant-numeric:tabular-nums}
+  .kpi .bm{font-size:12px;color:var(--muted)}
+  .kpi .dot{position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%}
+  .kpi .hint{font-size:11.5px;color:var(--ink-2);margin-top:7px;border-top:1px dashed var(--line);padding-top:7px;display:none}
+  .kpi.has-hint .hint{display:block}
+
+  /* ---------- category bars ---------- */
+  .bars{padding:20px 24px}
+  .bar-row{display:grid;grid-template-columns:230px 1fr 86px;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .bar-row:last-child{border-bottom:0}
+  .bar-row .nm{font-size:13px;color:var(--ink-2)}
+  .bar-row .nm small{color:var(--muted);font-weight:600}
+  .track{height:10px;border-radius:6px;background:#EEF1F4;overflow:hidden}
+  .fill{height:100%;border-radius:6px}
+  .bar-row .sc{text-align:right;font-weight:700;font-size:13.5px;font-variant-numeric:tabular-nums}
+  @media(max-width:720px){.bar-row{grid-template-columns:1fr 70px}.bar-row .track{grid-column:1/-1;order:3}}
+
+  /* ---------- findings ---------- */
+  .finding{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:16px 18px;border:1px solid var(--line);border-left-width:5px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);margin-bottom:12px}
+  .finding .sev{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:4px 8px;border-radius:6px;text-align:center;height:fit-content}
+  .finding h3{margin:0 0 5px;font-size:14.5px;color:var(--ink)}
+  .finding .meta{font-size:11.5px;color:var(--muted);margin-bottom:8px}
+  .finding .row{font-size:13px;margin:3px 0}
+  .finding .row b{color:var(--ink-2)}
+  .sev-critical{border-left-color:var(--crit)} .sev-critical .sev{background:var(--bad-bg);color:var(--crit)}
+  .sev-high{border-left-color:var(--bad)} .sev-high .sev{background:var(--bad-bg);color:var(--bad)}
+  .sev-medium{border-left-color:var(--warn)} .sev-medium .sev{background:var(--warn-bg);color:var(--warn)}
+  .sev-low{border-left-color:var(--accent-2)} .sev-low .sev{background:var(--info-bg);color:var(--accent-2)}
+
+  /* ---------- quick wins ---------- */
+  .qw{padding:18px 22px;background:linear-gradient(180deg,var(--good-bg),#fff);border:1px solid #CFEBDD}
+  .qw ul{margin:8px 0 0;padding-left:0;list-style:none}
+  .qw li{display:flex;gap:10px;align-items:flex-start;padding:6px 0;font-size:13.5px}
+  .qw li .chk{color:var(--good);flex:none;margin-top:1px}
+
+  /* ---------- tables ---------- */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:12.8px;background:var(--card)}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{background:#F8FAFC;color:var(--ink-2);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:0}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+  .tag.good{background:var(--good-bg);color:var(--good)} .tag.warn{background:var(--warn-bg);color:var(--warn)}
+  .tag.bad{background:var(--bad-bg);color:var(--bad)} .tag.info{background:var(--info-bg);color:var(--accent-2)}
+
+  /* ---------- funnel / two-col ---------- */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .panel{padding:18px 20px}
+  .panel h3{margin:0 0 10px;font-size:13.5px;color:var(--ink)}
+  .read{font-size:12.5px;color:var(--ink-2);background:#F8FAFC;border-radius:8px;padding:8px 10px;margin-top:4px}
+
+  /* ---------- action plan ---------- */
+  .ap-row{border-left:4px solid var(--line);padding:4px 0 4px 14px;margin:0 0 12px}
+  .ap-row.p1{border-left-color:var(--crit)} .ap-row.p2{border-left-color:var(--bad)}
+  .ap-row.p3{border-left-color:var(--warn)} .ap-row.p4{border-left-color:var(--accent-2)}
+  .ap-row .t{font-weight:600;font-size:14px;color:var(--ink)}
+  .ap-row .d{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* ---------- chips / footer ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:#fff}
+  .chip.miss{background:var(--bad-bg);border-color:#F3CBD2;color:var(--bad)}
+  .chip.have{background:var(--good-bg);border-color:#CFEBDD;color:var(--good)}
+  footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);text-align:center}
+  .disclaimer{font-size:11px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;margin-top:18px}
+  .empty{color:var(--muted);font-size:13px;font-style:italic}
+
+  /* ---------- confidence ---------- */
+  .conf{padding:20px 24px}
+  .conf-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .conf-meter{flex:1;min-width:220px}
+  .conf-track{height:14px;border-radius:8px;background:#EEF1F4;overflow:hidden}
+  .conf-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#D7263D,#C77700 45%,#1A9E5E)}
+  .conf-num{font-size:30px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+  .conf-lvl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:4px 10px;border-radius:999px}
+  .conf-basis{font-size:12.5px;color:var(--ink-2);margin-top:12px;background:#F8FAFC;border-radius:8px;padding:8px 10px}
+  .boost{margin-top:14px}
+  .boost h3{margin:0 0 8px;font-size:13px;color:var(--ink)}
+  .boost .b-row{display:grid;grid-template-columns:1fr 70px;gap:6px 12px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .boost .b-row:last-child{border-bottom:0}
+  .boost .b-item{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .boost .b-add{font-size:13px;font-weight:800;color:var(--good);text-align:right}
+  .boost .b-why{grid-column:1/-1;font-size:12px;color:var(--muted);margin-top:-2px}
+
+  /* ---------- authorship ---------- */
+  .author{margin-top:22px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:12.5px;color:var(--ink-2)}
+  .author .av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:12px}
+  .author a{color:var(--accent-2);text-decoration:none;font-weight:600}
+  .author a:hover{text-decoration:underline}
+
+  @media print{
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    .card,.kpi,.finding,.tbl-wrap{box-shadow:none}
+    section{break-inside:avoid}
+    .finding,.bar-row,.ap-row{break-inside:avoid}
+    .masthead::after{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* === REPORT_DATA_START === injected by build_report.py */
+const REPORT_DATA = {
+  "meta": {
+    "brand": "ErgoNest",
+    "marketplace": "Amazon.com (US)",
+    "account_type": "Seller, Brand Registered",
+    "category": "Home & Office, Bamboo Foot Rest (single ASIN, B0SAMPLE01, $34.95)",
+    "date_range": "About May 19 to Jun 17, 2026 (roughly 30 days, launch phase)",
+    "generated": "2026-06-21",
+    "analyst_note": "Demo report. The brand, product, and ASINs are anonymized sample data, not a real account. It shows what the skill produces for a single-product launch. The only modeling assumption is a 40% break-even ACOS, because no product cost was supplied."
+  },
+  "health": {
+    "score": 56,
+    "grade": "D",
+    "summary": "You are about four weeks into a launch with one product, so do not panic about the grade. Right now the ads lose money in aggregate (ACOS 70.6%, so roughly $70 of ad cost per $100 of ad sales). The cause is not your bidding, it is that the listing converts too few of the clicks you are buying, almost certainly because the product has no reviews yet. Your campaign structure is actually good and you already have clear winners. Fix conversion (get reviews), stop two bleeding campaigns, and bring your $2.44 click cost down, and this account turns around fast."
+  },
+  "confidence": {
+    "score": 70,
+    "level": "Medium",
+    "basis": "You uploaded six useful files (Campaign, Advertised Product, Search Term, Search Catalog Performance, Search Query Performance, and Brand Trends), so the ad picture is clear. The main missing piece is your product cost, which is why the break-even line is an assumption.",
+    "boosters": [
+      {
+        "item": "Product cost sheet (COGS, fees, sell price)",
+        "adds": "+14%",
+        "why": "Turns the assumed 40% break-even ACOS into your exact number, so every too high / too low call becomes precise instead of estimated."
+      },
+      {
+        "item": "Helium 10 or Jungle Scout keyword export",
+        "adds": "+8%",
+        "why": "Adds search volume and competition so we can size the ranking prize on terms like foot rest under desk (204k searches/quarter) and pick harvest targets with confidence."
+      },
+      {
+        "item": "Two or three more weeks of data",
+        "adds": "+6%",
+        "why": "The account is only about 30 days old, so many keywords have too few clicks to judge yet. More time makes the harvest and negative calls safer."
+      }
+    ]
+  },
+  "how_to_read_lede": "This report grades your Amazon ads from 0 to 100 and tells you, in plain English, what to do next. You are early in a launch, so read it as a roadmap, not a verdict.",
+  "how_to_read": [
+    "Start at the top. The score and the summary tell you where you stand in one breath.",
+    "Every section has a grey line under its title that explains what the block means and what to do with it.",
+    "The <b>Action plan</b> near the bottom is your ordered to-do list. If you only do one thing this week, do number 1.",
+    "Red is not failure. It is where the easy wins are. A normal launch looks a lot like this."
+  ],
+  "categories": [
+    {
+      "name": "Profitability (ACOS vs target)",
+      "weight": 22,
+      "score": 45
+    },
+    {
+      "name": "Wasted spend / negatives",
+      "weight": 18,
+      "score": 55
+    },
+    {
+      "name": "Harvesting & match-type structure",
+      "weight": 14,
+      "score": 65
+    },
+    {
+      "name": "Account & campaign structure",
+      "weight": 12,
+      "score": 80
+    },
+    {
+      "name": "Funnel health (CTR & CVR)",
+      "weight": 12,
+      "score": 45
+    },
+    {
+      "name": "Bid & placement optimization",
+      "weight": 8,
+      "score": 50
+    },
+    {
+      "name": "Budget pacing",
+      "weight": 6,
+      "score": 70
+    },
+    {
+      "name": "Branded vs non-branded & NTB",
+      "weight": 5,
+      "score": 60
+    },
+    {
+      "name": "Sponsored Brands / Display use",
+      "weight": 3,
+      "score": 40
+    }
+  ],
+  "kpis": [
+    {
+      "label": "ACOS",
+      "value": "70.6%",
+      "benchmark": "assumed break-even about 40%",
+      "status": "bad",
+      "hint": "You spend more on ads than the sale can carry. High is normal in a launch, but this is the number to drive down."
+    },
+    {
+      "label": "ROAS",
+      "value": "1.42x",
+      "benchmark": "need about 2.5x to break even",
+      "status": "bad",
+      "hint": "$1.42 back per $1 spent. The flip side of ACOS."
+    },
+    {
+      "label": "CPC",
+      "value": "$2.44",
+      "benchmark": "profitable is about $1.25",
+      "status": "bad",
+      "hint": "You pay almost double what a $34.95 product at 9% conversion can afford. Biggest single lever after reviews."
+    },
+    {
+      "label": "CTR",
+      "value": "0.35%",
+      "benchmark": "healthy about 0.4 to 0.5%",
+      "status": "warning",
+      "hint": "A bit low. Test a stronger main image and check your price."
+    },
+    {
+      "label": "CVR (ads)",
+      "value": "9.25%",
+      "benchmark": "Home/Office 10 to 13%",
+      "status": "warning",
+      "hint": "Listing search conversion is only 5.56%. People add to cart then leave. Reviews are the fix."
+    },
+    {
+      "label": "Ad spend",
+      "value": "$1,502",
+      "benchmark": "about 30 days",
+      "status": "info",
+      "hint": ""
+    },
+    {
+      "label": "Ad sales",
+      "value": "$2,128",
+      "benchmark": "57 orders",
+      "status": "info",
+      "hint": ""
+    },
+    {
+      "label": "TACOS",
+      "value": "n/a",
+      "benchmark": "need total sales to calculate",
+      "status": "info",
+      "hint": "Upload Business Reports total sales and we can track the real long-term health number."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-01",
+      "severity": "critical",
+      "area": "Listing / conversion",
+      "eta_days": 1,
+      "title": "Your listing converts too few clicks, almost certainly because it has no reviews yet",
+      "impact": "Last week the listing got 14,356 search views, 72 clicks, 21 add-to-carts, but only 4 sales (5.56% conversion). People add to cart then leave. This inflates the ACOS of every single campaign, and no bid change can fix it.",
+      "action": "Enroll this ASIN in Amazon Vine today and aim for 15 or more reviews. While you wait, double-check the main image shows the rocking foot rest in use, and confirm $34.95 is competitive. Hypothesis to test: with 15 to 30 reviews, does conversion jump from 5.56% toward 10%? That alone would roughly halve your ACOS."
+    },
+    {
+      "id": "F-02",
+      "severity": "high",
+      "area": "Bidding / CPC",
+      "eta_days": 1,
+      "title": "You pay $2.44 per click, about double what is profitable",
+      "impact": "At 9% conversion and a $34.95 price, the most you can pay per click and still aim for a 40% ACOS is about $1.25. Paying $2.44 is the main reason account ACOS is 70%.",
+      "action": "Switch the discovery campaigns (Bamboo Foot Rest - Subs and - Broad) to Dynamic bids, down only. Then lower bids 20 to 30% on any keyword whose ACOS is above your target. Keep higher bids only on the few terms that actually convert (see the harvest list)."
+    },
+    {
+      "id": "F-03",
+      "severity": "high",
+      "area": "Wasted spend",
+      "eta_days": 1,
+      "title": "One campaign and one search term are your worst money leaks",
+      "impact": "The campaign foot stool under desk - Exact - Rnk spent $143.70 at 206% ACOS. The search term foot stool under desk took 31 clicks and $132 for a single sale (378% ACOS). That term does not convert for you.",
+      "action": "Pause that ranking campaign (or cut its bid in half), and add foot stool under desk as a negative in your broad and auto campaigns so you stop paying for it elsewhere."
+    },
+    {
+      "id": "F-04",
+      "severity": "medium",
+      "area": "Discovery campaigns",
+      "eta_days": 7,
+      "title": "Your discovery campaigns run over target, which is fine if you prune them weekly",
+      "impact": "Subs ($235, 105% ACOS), Broad ($273, 82%), and ergonomic foot rest under desk ($138, 134%) are over break-even. Together they are about half your spend. They are doing their job (finding keywords), but they need a weekly cleanup.",
+      "action": "Keep them on, but cap their bids and run the weekly harvest-and-negative routine in the harvest section below. Move the keywords they prove into their own exact campaigns."
+    },
+    {
+      "id": "F-05",
+      "severity": "medium",
+      "area": "Scaling winners",
+      "eta_days": 7,
+      "title": "Your winners are under-funded",
+      "impact": "rocking foot rest under desk (27% ACOS), office foot rest under desk (25%), Close (45%), Phrase (48%), and several converting competitor products (ASIN B0RIVAL001 made 5 sales at 54%) are profitable or close to it, but small.",
+      "action": "Give these more budget. Build a dedicated exact-match campaign for office foot rest under desk and rocking foot rest under desk, and a product-targeting campaign aimed at the 3 to 5 competitor ASINs that already convert."
+    },
+    {
+      "id": "F-06",
+      "severity": "low",
+      "area": "Organic / visibility",
+      "eta_days": 30,
+      "title": "You are invisible in the category, which is normal at week 4",
+      "impact": "On every big search term (foot rest 211k searches, foot rest under desk 204k, foot stool under desk 78k) your brand share of impressions and purchases is 0%. All your sales are paid right now.",
+      "action": "This is expected for a new launch. Keep ranking spend on the head terms that convert, get reviews, and organic rank will start to follow. Re-check this in 30 days."
+    }
+  ],
+  "quick_wins": [
+    "Pause foot stool under desk - Exact - Rnk (206% ACOS), your worst leak (about 2 min)",
+    "Add foot stool under desk, office desk accessories, and cute desk accessories as negatives (about 5 min)",
+    "Switch the Subs and Broad campaigns to Dynamic bids, down only (about 2 min)",
+    "Enroll the ASIN in Amazon Vine to start getting reviews (about 10 min, biggest long-term win)",
+    "Promote office foot rest under desk (25% ACOS) into its own exact-match campaign (about 5 min)"
+  ],
+  "harvest": {
+    "promote": [
+      {
+        "term": "office foot rest under desk",
+        "campaign": "Subs (auto)",
+        "clicks": 13,
+        "orders": 4,
+        "acos": "25%",
+        "action": "To Manual Exact"
+      },
+      {
+        "term": "rocking foot rest under desk",
+        "campaign": "Phrase",
+        "clicks": 10,
+        "orders": 3,
+        "acos": "29%",
+        "action": "Fund existing exact"
+      },
+      {
+        "term": "office foot rest",
+        "campaign": "Broad",
+        "clicks": 6,
+        "orders": 2,
+        "acos": "15%",
+        "action": "To Manual Exact"
+      },
+      {
+        "term": "feet support under desk",
+        "campaign": "Broad",
+        "clicks": 11,
+        "orders": 2,
+        "acos": "45%",
+        "action": "To Manual Exact"
+      },
+      {
+        "term": "B0RIVAL001 (competitor ASIN)",
+        "campaign": "Subs (auto)",
+        "clicks": 47,
+        "orders": 5,
+        "acos": "54%",
+        "action": "To ASIN-target campaign"
+      },
+      {
+        "term": "B0RIVAL002 (competitor ASIN)",
+        "campaign": "ASIN - RFN",
+        "clicks": 6,
+        "orders": 2,
+        "acos": "13%",
+        "action": "To ASIN-target campaign"
+      },
+      {
+        "term": "B0RIVAL003 (competitor ASIN)",
+        "campaign": "ASIN - RFN",
+        "clicks": 17,
+        "orders": 2,
+        "acos": "38%",
+        "action": "To ASIN-target campaign"
+      }
+    ],
+    "negate": [
+      {
+        "term": "foot stool under desk",
+        "campaign": "Broad / Exact-Rnk",
+        "spend": "$132",
+        "clicks": 31,
+        "orders": 1,
+        "reason": "378% ACOS, your single worst term"
+      },
+      {
+        "term": "office desk accessories",
+        "campaign": "Subs (auto)",
+        "spend": "$14",
+        "clicks": 7,
+        "orders": 0,
+        "reason": "Not a foot rest shopper"
+      },
+      {
+        "term": "cute desk accessories",
+        "campaign": "Subs (auto)",
+        "spend": "$10",
+        "clicks": 6,
+        "orders": 0,
+        "reason": "Wrong intent"
+      },
+      {
+        "term": "foot rest for couch",
+        "campaign": "Broad",
+        "spend": "$5",
+        "clicks": 2,
+        "orders": 0,
+        "reason": "Different use, not under-desk"
+      },
+      {
+        "term": "wood walking pad",
+        "campaign": "Subs (auto)",
+        "spend": "$1",
+        "clicks": 1,
+        "orders": 0,
+        "reason": "Unrelated product"
+      }
+    ]
+  },
+  "asin_table": [
+    {
+      "asin": "B0SAMPLE01",
+      "title": "Bamboo Foot Rest for Under Desk ($34.95)",
+      "spend": "$1,502",
+      "sales": "$2,128",
+      "acos": "70.6%",
+      "tacos": "n/a",
+      "target_acos": "~40% (assumed)",
+      "verdict": "bad"
+    }
+  ],
+  "funnel": {
+    "diagnosis": "The bottleneck is your LISTING, not your bidding. Ads bring people to the page (72 clicks from 14,356 views last week), 21 add to cart, but only 4 buy. That is a 5.56% conversion rate, and the product shows no reviews yet. Shoppers adding to cart then leaving is the classic sign of too little trust. Bid tuning cannot fix this. Get reviews and the same ad spend will produce far more sales at a much lower ACOS.",
+    "rows": [
+      {
+        "metric": "CTR (ad clicks)",
+        "value": "0.35%",
+        "benchmark": "0.4 to 0.5%",
+        "read": "A little low. Test a stronger main image and confirm your price is competitive."
+      },
+      {
+        "metric": "CVR (search traffic)",
+        "value": "5.56%",
+        "benchmark": "10 to 13%",
+        "read": "Low. Clicks reach the page but do not buy. This is a listing and trust problem."
+      },
+      {
+        "metric": "Cart add to purchase",
+        "value": "19%",
+        "benchmark": "higher with reviews",
+        "read": "21 people added to cart, 4 bought. They hesitate at the final step, usually over reviews or price."
+      },
+      {
+        "metric": "Reviews",
+        "value": "none visible",
+        "benchmark": "aim 15+",
+        "read": "Top priority. Enroll in Amazon Vine. This single change lifts every metric above."
+      }
+    ]
+  },
+  "ad_types": [
+    {
+      "type": "Sponsored Products",
+      "score": 56,
+      "notes": [
+        "100% of your spend",
+        "Good structure: single-keyword ranking campaigns plus competitor ASIN targeting",
+        "Winners: rocking / office foot rest under desk, converting competitor ASINs",
+        "Bleeders: foot stool under desk, the Subs auto campaign"
+      ]
+    },
+    {
+      "type": "Sponsored Brands",
+      "score": null,
+      "notes": [
+        "Not running. Once you have a Brand Store and a few reviews, a Brand headline ad defends your name cheaply"
+      ]
+    },
+    {
+      "type": "Sponsored Display",
+      "score": null,
+      "notes": [
+        "Not running. Useful later to retarget the cart-adders who did not buy"
+      ]
+    },
+    {
+      "type": "Sponsored TV / DSP",
+      "score": null,
+      "notes": [
+        "Too early. Ignore until you are profitable and scaling"
+      ]
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": 1,
+      "action": "Get reviews: enroll the ASIN in Amazon Vine, aim for 15 or more",
+      "owner": "You / brand",
+      "eta": "Today",
+      "impact": "The single biggest lever on conversion and ACOS"
+    },
+    {
+      "priority": 2,
+      "action": "Stop the worst leak: pause foot stool under desk - Exact - Rnk and negate that term",
+      "owner": "PPC",
+      "eta": "Today",
+      "impact": "Stops about $140/mo of clear loss"
+    },
+    {
+      "priority": 3,
+      "action": "Lower CPC: set Subs and Broad to down-only, cut over-target bids 20 to 30%",
+      "owner": "PPC",
+      "eta": "Today",
+      "impact": "Pulls account ACOS from about 70% toward 50%"
+    },
+    {
+      "priority": 4,
+      "action": "Fund the winners: dedicated exact campaigns for the converting terms, plus an ASIN-target campaign for the 3 to 5 competitor ASINs that convert",
+      "owner": "PPC",
+      "eta": "This week",
+      "impact": "More sales at 25 to 50% ACOS"
+    },
+    {
+      "priority": 5,
+      "action": "Set a weekly Monday routine: harvest converters to exact, add clearly-irrelevant terms as negatives",
+      "owner": "PPC",
+      "eta": "Weekly",
+      "impact": "ACOS drifts down, organic rank climbs over time"
+    },
+    {
+      "priority": 6,
+      "action": "Give it 30 to 60 days and track TACOS and organic rank, not daily ACOS",
+      "owner": "You / brand",
+      "eta": "Ongoing",
+      "impact": "Keeps you from over-reacting during a normal launch"
+    }
+  ],
+  "glossary": [
+    {
+      "term": "ACOS",
+      "plain": "Ad spend divided by ad sales. 70% means $70 of ad cost for every $100 of ad sales. Lower is more efficient. Always compare it to your own profit margin, not to other sellers."
+    },
+    {
+      "term": "Break-even ACOS",
+      "plain": "The ACOS where you make exactly $0 profit. It equals your profit margin before ads. Below it you profit, above it you lose. We assumed 40% because you have not shared your costs yet."
+    },
+    {
+      "term": "ROAS",
+      "plain": "The flip side of ACOS. Sales divided by ad spend. 1.42x means $1.42 back for every $1 spent."
+    },
+    {
+      "term": "TACOS",
+      "plain": "Total ad spend divided by ALL sales, ads plus organic. The real long-term health number. We could not calculate it without your total sales."
+    },
+    {
+      "term": "CTR",
+      "plain": "Click-through rate. Of the people who saw your ad, how many clicked. Driven by your main image, title, and price."
+    },
+    {
+      "term": "CVR",
+      "plain": "Conversion rate. Of the people who clicked, how many bought. Driven by your listing: reviews, price, images, content."
+    },
+    {
+      "term": "CPC",
+      "plain": "Cost per click. What you pay each time someone clicks your ad. Yours is high for a $34.95 product."
+    },
+    {
+      "term": "Negative keyword",
+      "plain": "A search term you block so your ad stops showing for it. Used to cut wasted spend."
+    },
+    {
+      "term": "Harvest",
+      "plain": "Taking a search term that already made sales and giving it its own exact-match campaign so it gets more budget and control."
+    }
+  ],
+  "data_provided": [
+    "Campaign report",
+    "Advertised Product report",
+    "Search Term report",
+    "Search Catalog Performance",
+    "Search Query Performance (Brand view)",
+    "Brand Trends"
+  ],
+  "data_missing": [
+    "Product cost / COGS sheet",
+    "Targeting report",
+    "Placement report",
+    "A few more weeks of data"
+  ]
+};
+/* === REPORT_DATA_END === */
+
+/* ------------------------------------------------------------------ */
+/* Rendering. Pure, no deps. Hides any section without data.            */
+/* ------------------------------------------------------------------ */
+(function(){
+  const D = REPORT_DATA, E = (t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+  const app = document.getElementById('app');
+  const C = {good:'var(--good)',warning:'var(--warn)',bad:'var(--bad)',info:'var(--info)'};
+  const gradeColor = g => ({A:'var(--good)',B:'#5FA8D3',C:'var(--warn)',D:'#E07B39',F:'var(--bad)'}[g]||'var(--muted)');
+  const ic = p => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const ICONS = {
+    bolt:'<path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/>',
+    target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+    alert:'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    check:'<polyline points="20 6 9 17 4 12"/>',
+    grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+    funnel:'<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+    chart:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+    folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+    flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>'
+  };
+  const sec = (icon,title,note,help) => {
+    const wrap = E('div');
+    const h = E('div','sec-head');
+    h.appendChild(E('div','ic',`<span style="color:var(--accent-2)">${ic(ICONS[icon])}</span>`));
+    h.appendChild(E('h2',null,title));
+    if(note) h.appendChild(E('div','note',note));
+    wrap.appendChild(h);
+    if(help) wrap.appendChild(E('div','sec-help',help));
+    return wrap;
+  };
+  const has = v => Array.isArray(v) ? v.length>0 : (v!=null && v!=='');
+
+  /* ---- masthead ---- */
+  const m = D.meta||{};
+  const mh = E('div','masthead');
+  mh.innerHTML = `
+    <div class="brandline"><div class="logo">a</div><div style="font-size:12px;color:#C9D3DE;letter-spacing:.4px;text-transform:uppercase">Amazon Ads · Health Report</div></div>
+    <h1>${m.brand||'Amazon Advertising Account'}</h1>
+    <div class="sub">${[m.marketplace,m.account_type,m.category].filter(Boolean).join('  ·  ')}</div>
+    <div class="metagrid">
+      ${m.date_range?`<div>Reporting period: <b>${m.date_range}</b></div>`:''}
+      ${m.generated?`<div>Generated: <b>${m.generated}</b></div>`:''}
+      ${D.confidence?`<div>Report confidence: <b>${D.confidence.score}% · ${D.confidence.level}</b></div>`:''}
+    </div>`;
+  app.appendChild(mh);
+
+  /* ---- score hero ---- */
+  if(D.health){
+    const hero = E('div','hero');
+    const score = Math.max(0,Math.min(100, D.health.score??0));
+    const r=80, circ=2*Math.PI*r, off=circ*(1-score/100);
+    const col = score>=90?'var(--good)':score>=75?'#5FA8D3':score>=60?'var(--warn)':score>=40?'#E07B39':'var(--bad)';
+    const g = E('div','card gauge-card');
+    g.innerHTML = `
+      <div class="gauge">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="${r}" fill="none" stroke="#EEF1F4" stroke-width="14"/>
+          <circle cx="90" cy="90" r="${r}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round"
+            stroke-dasharray="${circ}" stroke-dashoffset="${off}"/>
+        </svg>
+        <div class="num"><div class="s">${score}</div><div class="o">/ 100</div></div>
+      </div>
+      <div class="grade-pill" style="background:${gradeColor(D.health.grade)}1f;color:${gradeColor(D.health.grade)}">Grade ${D.health.grade||'-'}</div>`;
+    const s = E('div','card summary-card');
+    s.innerHTML = `<h2><span style="color:var(--accent)">${ic(ICONS.flag)}</span> Executive summary</h2><p>${D.health.summary||''}</p>`;
+    hero.appendChild(g); hero.appendChild(s); app.appendChild(hero);
+  }
+
+  /* ---- how to read this report ---- */
+  if(has(D.how_to_read)){
+    const card=E('div','card howto');
+    card.innerHTML=`<h2><span style="color:var(--accent-2)">${ic(ICONS.flag)}</span> How to read this report</h2>
+      ${D.how_to_read_lede?`<p class="lede">${D.how_to_read_lede}</p>`:''}
+      <ol>${D.how_to_read.map(x=>`<li>${x}</li>`).join('')}</ol>`;
+    app.appendChild(card);
+  }
+
+  /* ---- report confidence / accuracy ---- */
+  if(D.confidence){
+    const cf=D.confidence, sc=Math.max(0,Math.min(100,cf.score??0));
+    const lvl=cf.level||(sc>=75?'High':sc>=50?'Medium':'Low');
+    const lcol=sc>=75?'var(--good)':sc>=50?'var(--warn)':'var(--bad)';
+    const lbg =sc>=75?'var(--good-bg)':sc>=50?'var(--warn-bg)':'var(--bad-bg)';
+    const s=E('section'); s.appendChild(sec('shield','Report confidence',' how much to trust this analysis','This score is about the DATA you uploaded, not your ads. A low number does not mean your account is bad. It means adding the files listed below would make the analysis sharper.'));
+    const card=E('div','card conf');
+    card.innerHTML=`
+      <div class="conf-top">
+        <div class="conf-num">${sc}%</div>
+        <span class="conf-lvl" style="background:${lbg};color:${lcol}">${lvl} confidence</span>
+        <div class="conf-meter"><div class="conf-track"><div class="conf-fill" style="width:${sc}%"></div></div></div>
+      </div>
+      ${cf.basis?`<div class="conf-basis">${cf.basis}</div>`:''}
+      ${has(cf.boosters)?`<div class="boost"><h3>Add these to raise accuracy</h3>
+        ${cf.boosters.map(b=>`<div class="b-row"><div class="b-item">${b.item}</div><div class="b-add">${b.adds||''}</div>${b.why?`<div class="b-why">${b.why}</div>`:''}</div>`).join('')}
+      </div>`:''}`;
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- KPI cards ---- */
+  if(has(D.kpis)){
+    const s=E('section'); s.appendChild(sec('chart','Key metrics vs benchmark',null,'Each card is one health number next to a typical benchmark. Green is fine, yellow needs a look, red needs action. Golden rule: judge ACOS against YOUR break-even (your profit margin), not against the average.'));
+    const grid=E('div','kpis');
+    D.kpis.forEach(k=>{
+      const card=E('div','kpi'+(k.hint?' has-hint':''));
+      card.innerHTML=`<div class="dot" style="background:${C[k.status]||'var(--muted)'}"></div>
+        <div class="lab">${k.label}</div><div class="val">${k.value}</div>
+        <div class="bm">${k.benchmark||''}</div>${k.hint?`<div class="hint">${k.hint}</div>`:''}`;
+      grid.appendChild(card);
+    });
+    s.appendChild(grid); app.appendChild(s);
+  }
+
+  /* ---- category bars ---- */
+  if(has(D.categories)){
+    const s=E('section'); s.appendChild(sec('grid','Category scores',null,'Your overall score is built from these areas, weighted by how much each one affects money. The lowest bars are where the biggest gains are, so start there.'));
+    const card=E('div','card bars');
+    D.categories.forEach(c=>{
+      const sc=Math.max(0,Math.min(100,c.score??0));
+      const col=sc>=75?'var(--good)':sc>=60?'var(--warn)':'var(--bad)';
+      const row=E('div','bar-row');
+      row.innerHTML=`<div class="nm">${c.name} <small>(${c.weight}%)</small></div>
+        <div class="track"><div class="fill" style="width:${sc}%;background:${col}"></div></div>
+        <div class="sc" style="color:${col}">${sc}</div>`;
+      card.appendChild(row);
+    });
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- quick wins ---- */
+  if(has(D.quick_wins)){
+    const s=E('section'); s.appendChild(sec('bolt','Quick wins',' high impact · under 15 min each','Do these first. A few minutes each, fast payback, and none of them put your account at risk.'));
+    const card=E('div','card qw');
+    const ul=E('ul');
+    D.quick_wins.forEach(q=>{const li=E('li');li.innerHTML=`<span class="chk">${ic(ICONS.check)}</span><span>${q}</span>`;ul.appendChild(li);});
+    card.appendChild(ul); s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- findings ---- */
+  if(has(D.findings)){
+    const order={critical:0,high:1,medium:2,low:3};
+    const s=E('section'); s.appendChild(sec('alert','Findings',`${D.findings.length} issues`,'The problems we found, worst first. Each one shows the impact in plain dollars and the exact fix to make. Work top to bottom.'));
+    [...D.findings].sort((a,b)=>(order[a.severity]??9)-(order[b.severity]??9)).forEach(f=>{
+      const el=E('div','finding sev-'+f.severity);
+      el.innerHTML=`<div class="sev">${f.severity}</div>
+        <div><h3>${f.title}</h3>
+          <div class="meta">${[f.id,f.area,(f.eta_days!=null?('fix in '+f.eta_days+'d'):'')].filter(Boolean).join(' · ')}</div>
+          ${f.impact?`<div class="row"><b>Impact:</b> ${f.impact}</div>`:''}
+          ${f.action?`<div class="row"><b>Action:</b> ${f.action}</div>`:''}
+        </div>`;
+      s.appendChild(el);
+    });
+    app.appendChild(s);
+  }
+
+  /* ---- harvest tables ---- */
+  if(D.harvest && (has(D.harvest.promote)||has(D.harvest.negate))){
+    const s=E('section'); s.appendChild(sec('target','Search-term harvest plan',null,'Two lists pulled from your Search Term report. Promote the winners on the left into their own exact-match campaigns so they get more budget. Add the wasted terms on the right as negatives so you stop paying for clicks that never sell. Repeat this weekly.'));
+    if(has(D.harvest.promote)){
+      s.appendChild(E('h3',null,'<span style="font-size:13px;color:var(--good);margin:4px 0;display:block">Promote to Manual Exact (winning terms)</span>'));
+      const w=E('div','tbl-wrap');
+      w.innerHTML=`<table><thead><tr><th>Search term</th><th>Source campaign</th><th class="num">Clicks</th><th class="num">Orders</th><th class="num">ACOS</th><th>Action</th></tr></thead><tbody>
+        ${D.harvest.promote.map(r=>`<tr><td>${r.term}</td><td>${r.campaign}</td><td class="num">${r.clicks}</td><td class="num">${r.orders}</td><td class="num">${r.acos}</td><td><span class="tag good">${r.action}</span></td></tr>`).join('')}
+      </tbody></table>`;
+      s.appendChild(w);
+    }
+    if(has(D.harvest.negate)){
+      s.appendChild(E('h3',null,'<span style="font-size:13px;color:var(--bad);margin:14px 0 4px;display:block">Add as negatives (wasted spend)</span>'));
+      const w=E('div','tbl-wrap');
+      w.innerHTML=`<table><thead><tr><th>Search term</th><th>Campaign</th><th class="num">Spend</th><th class="num">Clicks</th><th class="num">Orders</th><th>Why</th></tr></thead><tbody>
+        ${D.harvest.negate.map(r=>`<tr><td>${r.term}</td><td>${r.campaign}</td><td class="num">${r.spend}</td><td class="num">${r.clicks}</td><td class="num">${r.orders}</td><td>${r.reason}</td></tr>`).join('')}
+      </tbody></table>`;
+      s.appendChild(w);
+    }
+    app.appendChild(s);
+  }
+
+  /* ---- ASIN profitability ---- */
+  if(has(D.asin_table)){
+    const s=E('section'); s.appendChild(sec('list','ACOS by ASIN: profitability',null,'Each product judged against its target ACOS. Green makes money, red loses it. For a red row, lower the bid or pause it until the listing converts better, then turn it back on.'));
+    const w=E('div','tbl-wrap');
+    w.innerHTML=`<table><thead><tr><th>ASIN</th><th>Product</th><th class="num">Spend</th><th class="num">Ad sales</th><th class="num">ACOS</th><th class="num">TACOS</th><th class="num">Target</th><th>Verdict</th></tr></thead><tbody>
+      ${D.asin_table.map(r=>`<tr><td style="font-family:var(--mono)">${r.asin}</td><td>${r.title||''}</td><td class="num">${r.spend}</td><td class="num">${r.sales}</td><td class="num">${r.acos}</td><td class="num">${r.tacos||'-'}</td><td class="num">${r.target_acos||'-'}</td><td><span class="tag ${r.verdict==='good'?'good':r.verdict==='warn'?'warn':'bad'}">${r.verdict==='good'?'Profitable':r.verdict==='warn'?'Watch':'Unprofitable'}</span></td></tr>`).join('')}
+    </tbody></table>`;
+    s.appendChild(w); app.appendChild(s);
+  }
+
+  /* ---- funnel diagnosis + ad types ---- */
+  if(D.funnel || has(D.ad_types)){
+    const s=E('section'); s.appendChild(sec('funnel','Funnel diagnosis & ad-type breakdown',null,'This answers the key question: is the problem your ADS or your LISTING. If clicks are cheap but few people buy, spending more on ads will not help. Fix the listing (images, price, reviews) first.'));
+    const g=E('div','grid2');
+    if(D.funnel){
+      const p=E('div','card panel');
+      p.innerHTML=`<h3>Ad problem vs listing problem</h3>${D.funnel.diagnosis?`<div class="read">${D.funnel.diagnosis}</div>`:''}
+        ${has(D.funnel.rows)?`<div class="tbl-wrap" style="margin-top:10px;border:0;box-shadow:none"><table><thead><tr><th>Signal</th><th class="num">Value</th><th class="num">Benchmark</th><th>Read</th></tr></thead><tbody>
+        ${D.funnel.rows.map(r=>`<tr><td>${r.metric}</td><td class="num">${r.value}</td><td class="num">${r.benchmark}</td><td style="white-space:normal">${r.read}</td></tr>`).join('')}</tbody></table></div>`:''}`;
+      g.appendChild(p);
+    }
+    if(has(D.ad_types)){
+      const p=E('div','card panel');
+      p.innerHTML=`<h3>By ad type</h3>`+D.ad_types.map(t=>{
+        const sc=t.score==null?'<span class="tag info">n/a</span>':`<span class="tag ${t.score>=75?'good':t.score>=60?'warn':'bad'}">${t.score}</span>`;
+        return `<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:13px;color:var(--ink)">${t.type}</b> ${sc}</div>
+        ${has(t.notes)?`<ul style="margin:4px 0 0;padding-left:16px;font-size:12px;color:var(--ink-2)">${t.notes.map(n=>`<li>${n}</li>`).join('')}</ul>`:''}</div>`;
+      }).join('');
+      g.appendChild(p);
+    }
+    s.appendChild(g); app.appendChild(s);
+  }
+
+  /* ---- action plan ---- */
+  if(has(D.action_plan)){
+    const s=E('section'); s.appendChild(sec('flag','Prioritized action plan',null,'Your to-do list, in order. If you only do one thing this week, do number 1. Each item names who should do it and the payoff to expect.'));
+    const card=E('div','card panel');
+    [...D.action_plan].sort((a,b)=>(a.priority||9)-(b.priority||9)).forEach(a=>{
+      const row=E('div','ap-row p'+(a.priority||4));
+      row.innerHTML=`<div class="t">${a.priority? a.priority+'. ':''}${a.action}</div>
+        <div class="d">${[a.owner&&('Owner: '+a.owner),a.eta&&('ETA: '+a.eta),a.impact&&('Impact: '+a.impact)].filter(Boolean).join('  ·  ')}</div>`;
+      card.appendChild(row);
+    });
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- data coverage ---- */
+  if(has(D.data_provided)||has(D.data_missing)){
+    const s=E('section'); s.appendChild(sec('folder','Data coverage',null,'Green files were used in this report. Red files were not provided. Adding the red ones next time gives a more accurate and complete picture.'));
+    const card=E('div','card panel');
+    const chips=E('div','chips');
+    (D.data_provided||[]).forEach(d=>chips.appendChild(E('span','chip have',ic(ICONS.check)+' '+d)));
+    (D.data_missing||[]).forEach(d=>chips.appendChild(E('span','chip miss','+ '+d+' (not provided)')));
+    card.appendChild(chips);
+    if(has(D.data_missing)) card.appendChild(E('div','read','Adding the missing reports above would raise confidence. See the data-collection guide for how to export each.'));
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- glossary ---- */
+  if(has(D.glossary)){
+    const s=E('section'); s.appendChild(sec('list','Plain-English glossary',null,'Quick definitions for the terms in this report, in everyday language.'));
+    const card=E('div','card gloss');
+    D.glossary.forEach(g=>{
+      const row=E('div','g-row');
+      row.innerHTML=`<div class="g-term">${g.term}</div><div class="g-def">${g.plain}</div>`;
+      card.appendChild(row);
+    });
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- disclaimer + authorship + footer ---- */
+  if(m.analyst_note) app.appendChild(E('div','disclaimer',m.analyst_note));
+  const auth=E('div','author');
+  auth.innerHTML=`<span class="av">OG</span><span>Built by <a href="https://ggrn.pro" target="_blank" rel="noopener">Oleg Gagarin · ggrn.pro</a></span>`;
+  app.appendChild(auth);
+  app.appendChild(E('footer',null,'Amazon Ads Analyzer · Benchmarks are directional averages. Your margin and stage determine the right targets · This is an analysis aid, not financial advice. Not affiliated with Amazon.'));
+})();
+</script>
+</body>
+</html>

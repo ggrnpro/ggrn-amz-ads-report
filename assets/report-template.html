@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon Ads Health Report</title>
+<style>
+  /* ============================================================
+     Amazon Ads Health Report. Self-contained template.
+     The skill replaces the REPORT_DATA object (bottom of <body>)
+     with the real analysis. Everything renders from that object.
+     No external requests, so it is safe to open offline or email to a client.
+     ============================================================ */
+  :root{
+    --ink:#232F3E;        /* Amazon squid ink */
+    --ink-2:#37475A;
+    --accent:#FF9900;     /* Amazon orange */
+    --accent-2:#146EB4;   /* Amazon blue */
+    --bg:#F3F4F6;
+    --card:#FFFFFF;
+    --line:#E5E7EB;
+    --muted:#6B7280;
+    --text:#1F2937;
+    --good:#1A9E5E;  --good-bg:#E7F6EE;
+    --warn:#C77700;  --warn-bg:#FDF3E2;
+    --bad:#D7263D;   --bad-bg:#FBE9EC;
+    --crit:#B11226;
+    --info:#146EB4;  --info-bg:#E8F1FA;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(16,24,40,.06),0 4px 16px rgba(16,24,40,.06);
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:32px 24px 64px}
+  a{color:var(--accent-2)}
+
+  /* ---------- header ---------- */
+  .masthead{background:linear-gradient(135deg,var(--ink) 0%,var(--ink-2) 100%);color:#fff;border-radius:var(--radius);padding:28px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .masthead::after{content:"";position:absolute;right:-40px;top:-40px;width:220px;height:220px;background:radial-gradient(circle,rgba(255,153,0,.22),transparent 70%)}
+  .masthead h1{margin:0 0 4px;font-size:23px;letter-spacing:-.2px}
+  .masthead .sub{color:#C9D3DE;font-size:13.5px}
+  .brandline{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .brandline .logo{width:30px;height:30px;border-radius:8px;background:var(--accent);display:grid;place-items:center;color:var(--ink);font-weight:800;font-size:16px;flex:none}
+  .metagrid{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:14px;font-size:12.5px;color:#D7DEE6}
+  .metagrid b{color:#fff;font-weight:600}
+
+  /* ---------- score hero ---------- */
+  .hero{display:grid;grid-template-columns:230px 1fr;gap:24px;margin-top:22px}
+  @media(max-width:720px){.hero{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .gauge-card{padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+  .gauge{position:relative;width:180px;height:180px}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .num .s{font-size:46px;font-weight:800;line-height:1;color:var(--ink)}
+  .gauge .num .o{font-size:12px;color:var(--muted)}
+  .grade-pill{margin-top:12px;font-weight:800;font-size:14px;padding:5px 16px;border-radius:999px}
+  .summary-card{padding:22px 24px}
+  .summary-card h2{margin:0 0 8px;font-size:15px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .summary-card p{margin:0;color:var(--text);font-size:14px}
+
+  /* ---------- section ---------- */
+  section{margin-top:30px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+  .sec-head .ic{width:26px;height:26px;border-radius:8px;background:var(--info-bg);display:grid;place-items:center;flex:none}
+  .sec-head h2{margin:0;font-size:17px;color:var(--ink);letter-spacing:-.2px}
+  .sec-head .note{font-size:12px;color:var(--muted);margin-left:auto}
+  .sec-help{font-size:12.5px;color:var(--ink-2);margin:0 0 12px;line-height:1.5;max-width:880px}
+  .sec-help b{color:var(--ink)}
+
+  /* ---------- how to read ---------- */
+  .howto{padding:18px 22px;background:var(--info-bg);border:1px solid #CFE0F2;margin-top:22px}
+  .howto h2{margin:0 0 4px;font-size:15px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .howto .lede{font-size:13px;color:var(--ink-2);margin:0 0 10px}
+  .howto ol{margin:0;padding-left:20px}
+  .howto li{font-size:13px;color:var(--ink-2);padding:3px 0}
+  .howto li b{color:var(--ink)}
+
+  /* ---------- glossary ---------- */
+  .gloss{padding:18px 22px}
+  .gloss .g-row{display:grid;grid-template-columns:160px 1fr;gap:6px 16px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .gloss .g-row:last-child{border-bottom:0}
+  .gloss .g-term{font-weight:700;font-size:13px;color:var(--ink)}
+  .gloss .g-def{font-size:12.5px;color:var(--ink-2)}
+  @media(max-width:640px){.gloss .g-row{grid-template-columns:1fr}}
+
+  /* ---------- KPI cards ---------- */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{padding:16px 16px 14px;border-radius:12px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);position:relative}
+  .kpi .lab{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:600}
+  .kpi .val{font-size:27px;font-weight:800;color:var(--ink);margin:2px 0 2px;font-variant-numeric:tabular-nums}
+  .kpi .bm{font-size:12px;color:var(--muted)}
+  .kpi .dot{position:absolute;top:14px;right:14px;width:10px;height:10px;border-radius:50%}
+  .kpi .hint{font-size:11.5px;color:var(--ink-2);margin-top:7px;border-top:1px dashed var(--line);padding-top:7px;display:none}
+  .kpi.has-hint .hint{display:block}
+
+  /* ---------- category bars ---------- */
+  .bars{padding:20px 24px}
+  .bar-row{display:grid;grid-template-columns:230px 1fr 86px;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .bar-row:last-child{border-bottom:0}
+  .bar-row .nm{font-size:13px;color:var(--ink-2)}
+  .bar-row .nm small{color:var(--muted);font-weight:600}
+  .track{height:10px;border-radius:6px;background:#EEF1F4;overflow:hidden}
+  .fill{height:100%;border-radius:6px}
+  .bar-row .sc{text-align:right;font-weight:700;font-size:13.5px;font-variant-numeric:tabular-nums}
+  @media(max-width:720px){.bar-row{grid-template-columns:1fr 70px}.bar-row .track{grid-column:1/-1;order:3}}
+
+  /* ---------- findings ---------- */
+  .finding{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:16px 18px;border:1px solid var(--line);border-left-width:5px;border-radius:12px;background:var(--card);box-shadow:var(--shadow);margin-bottom:12px}
+  .finding .sev{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:4px 8px;border-radius:6px;text-align:center;height:fit-content}
+  .finding h3{margin:0 0 5px;font-size:14.5px;color:var(--ink)}
+  .finding .meta{font-size:11.5px;color:var(--muted);margin-bottom:8px}
+  .finding .row{font-size:13px;margin:3px 0}
+  .finding .row b{color:var(--ink-2)}
+  .sev-critical{border-left-color:var(--crit)} .sev-critical .sev{background:var(--bad-bg);color:var(--crit)}
+  .sev-high{border-left-color:var(--bad)} .sev-high .sev{background:var(--bad-bg);color:var(--bad)}
+  .sev-medium{border-left-color:var(--warn)} .sev-medium .sev{background:var(--warn-bg);color:var(--warn)}
+  .sev-low{border-left-color:var(--accent-2)} .sev-low .sev{background:var(--info-bg);color:var(--accent-2)}
+
+  /* ---------- quick wins ---------- */
+  .qw{padding:18px 22px;background:linear-gradient(180deg,var(--good-bg),#fff);border:1px solid #CFEBDD}
+  .qw ul{margin:8px 0 0;padding-left:0;list-style:none}
+  .qw li{display:flex;gap:10px;align-items:flex-start;padding:6px 0;font-size:13.5px}
+  .qw li .chk{color:var(--good);flex:none;margin-top:1px}
+
+  /* ---------- tables ---------- */
+  .tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:12.8px;background:var(--card)}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{background:#F8FAFC;color:var(--ink-2);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  tr:last-child td{border-bottom:0}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px}
+  .tag.good{background:var(--good-bg);color:var(--good)} .tag.warn{background:var(--warn-bg);color:var(--warn)}
+  .tag.bad{background:var(--bad-bg);color:var(--bad)} .tag.info{background:var(--info-bg);color:var(--accent-2)}
+
+  /* ---------- funnel / two-col ---------- */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.grid2{grid-template-columns:1fr}}
+  .panel{padding:18px 20px}
+  .panel h3{margin:0 0 10px;font-size:13.5px;color:var(--ink)}
+  .read{font-size:12.5px;color:var(--ink-2);background:#F8FAFC;border-radius:8px;padding:8px 10px;margin-top:4px}
+
+  /* ---------- action plan ---------- */
+  .ap-row{border-left:4px solid var(--line);padding:4px 0 4px 14px;margin:0 0 12px}
+  .ap-row.p1{border-left-color:var(--crit)} .ap-row.p2{border-left-color:var(--bad)}
+  .ap-row.p3{border-left-color:var(--warn)} .ap-row.p4{border-left-color:var(--accent-2)}
+  .ap-row .t{font-weight:600;font-size:14px;color:var(--ink)}
+  .ap-row .d{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* ---------- chips / footer ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:#fff}
+  .chip.miss{background:var(--bad-bg);border-color:#F3CBD2;color:var(--bad)}
+  .chip.have{background:var(--good-bg);border-color:#CFEBDD;color:var(--good)}
+  footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);text-align:center}
+  .disclaimer{font-size:11px;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:10px;padding:12px 14px;margin-top:18px}
+  .empty{color:var(--muted);font-size:13px;font-style:italic}
+
+  /* ---------- confidence ---------- */
+  .conf{padding:20px 24px}
+  .conf-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .conf-meter{flex:1;min-width:220px}
+  .conf-track{height:14px;border-radius:8px;background:#EEF1F4;overflow:hidden}
+  .conf-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#D7263D,#C77700 45%,#1A9E5E)}
+  .conf-num{font-size:30px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1}
+  .conf-lvl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:4px 10px;border-radius:999px}
+  .conf-basis{font-size:12.5px;color:var(--ink-2);margin-top:12px;background:#F8FAFC;border-radius:8px;padding:8px 10px}
+  .boost{margin-top:14px}
+  .boost h3{margin:0 0 8px;font-size:13px;color:var(--ink)}
+  .boost .b-row{display:grid;grid-template-columns:1fr 70px;gap:6px 12px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .boost .b-row:last-child{border-bottom:0}
+  .boost .b-item{font-size:13px;font-weight:600;color:var(--ink-2)}
+  .boost .b-add{font-size:13px;font-weight:800;color:var(--good);text-align:right}
+  .boost .b-why{grid-column:1/-1;font-size:12px;color:var(--muted);margin-top:-2px}
+
+  /* ---------- authorship ---------- */
+  .author{margin-top:22px;display:flex;align-items:center;justify-content:center;gap:10px;font-size:12.5px;color:var(--ink-2)}
+  .author .av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:12px}
+  .author a{color:var(--accent-2);text-decoration:none;font-weight:600}
+  .author a:hover{text-decoration:underline}
+
+  @media print{
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    .card,.kpi,.finding,.tbl-wrap{box-shadow:none}
+    section{break-inside:avoid}
+    .finding,.bar-row,.ap-row{break-inside:avoid}
+    .masthead::after{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+/* === REPORT_DATA_START ===
+   The skill replaces THIS object with the real analysis.
+   Any section left empty/undefined is automatically hidden.
+   The sample below is illustrative so the file previews on its own. */
+const REPORT_DATA = {
+  meta: {
+    brand: "Sample Brand",
+    marketplace: "Amazon.com (US)",
+    account_type: "Seller · Brand Registered",
+    category: "Health & Household, Supplements",
+    date_range: "2026-03-23 → 2026-06-21 (90 days)",
+    generated: "2026-06-21",
+    analyst_note: "Replace REPORT_DATA with your analysis. This sample shows every section the template can render."
+  },
+  health: { score: 71, grade: "C",
+    summary: "Spend is profitable in aggregate (ACOS 31% vs 35% break-even) but ~22% of it is leaking on un-harvested auto search terms and three unprofitable ASINs. TACOS is flat, not falling, so paid is not yet lifting organic. Biggest lever: a weekly search-term harvest + negative routine and pausing the 3x-over-target SKUs."
+  },
+  confidence: {
+    score: 62, level: "Medium",
+    basis: "Based on 4 of 9 high-value inputs. Contribution margin was estimated from the category default, not supplied.",
+    boosters: [
+      { item:"Brand Analytics, Search Query Performance", adds:"+15%", why:"Splits ad vs organic share and surfaces keyword / share-of-voice gaps you can't see from ad reports alone." },
+      { item:"Contribution margin / COGS sheet",           adds:"+10%", why:"Sets an exact break-even & target ACOS instead of a category assumption." },
+      { item:"Helium 10 / Jungle Scout keyword export",    adds:"+8%",  why:"Adds search volume & competition so keyword priorities and harvest picks are data-backed, not guessed." },
+      { item:"Placement report",                           adds:"+5%",  why:"Enables top-of-search vs product-page bid-multiplier tuning." }
+    ]
+  },
+  categories: [
+    { name:"Search-Term Harvesting & Negatives", weight:25, score:55 },
+    { name:"ACOS / TACOS Discipline",            weight:20, score:74 },
+    { name:"Campaign Structure & Portfolios",    weight:15, score:80 },
+    { name:"Bid & Budget Management",            weight:15, score:68 },
+    { name:"Sponsored Brands",                   weight:10, score:72 },
+    { name:"Sponsored Display",                  weight:10, score:60 },
+    { name:"Brand Analytics & Reporting",        weight:5,  score:90 }
+  ],
+  kpis: [
+    { label:"ACOS",  value:"31%",  benchmark:"break-even 35%, target 28% or lower", status:"warning", hint:"Profitable but above target, so tighten bids on terms over 40% ACOS." },
+    { label:"TACOS", value:"11.2%",benchmark:"trend: flat (▲0.3pp QoQ)",      status:"warning", hint:"Want a downward trend = paid lifting organic. Flat = paid replacing organic." },
+    { label:"ROAS",  value:"3.2x", benchmark:"= 1 / ACOS",                    status:"good",    hint:"" },
+    { label:"CTR",   value:"0.38%",benchmark:"category ~0.40%",               status:"good",    hint:"" },
+    { label:"CVR",   value:"9.1%", benchmark:"category 8 to 12%",                status:"good",    hint:"" },
+    { label:"CPC",   value:"$1.12",benchmark:"category $0.90 to $1.40",          status:"good",    hint:"" },
+    { label:"Ad Spend",  value:"$42,180", benchmark:"90 days", status:"info", hint:"" },
+    { label:"Ad Sales",  value:"$136,070",benchmark:"ad-attributed", status:"info", hint:"" }
+  ],
+  findings: [
+    { id:"H-01", severity:"critical", area:"Wasted spend", eta_days:1,
+      title:"$3,910 spent on 41 search terms with zero orders (90d)",
+      impact:"≈9% of total spend recoverable; concentrated in the SP-Auto campaign",
+      action:"Add the 41 zero-order, >$25-spend terms as exact/phrase negatives in the auto campaign; redeploy budget to converting manual terms." },
+    { id:"H-02", severity:"high", area:"Harvesting", eta_days:3,
+      title:"No Auto→Manual harvest in last 60 days",
+      impact:"23 converting search terms still only running in Auto at higher CPC than a dedicated exact would cost",
+      action:"Promote the 23 converters to Manual Exact in their target campaign; add them as negatives in Auto so spend stops overlapping." },
+    { id:"H-03", severity:"high", area:"Profitability", eta_days:2,
+      title:"3 ASINs running 2.5 to 3.4x over target ACOS",
+      impact:"$2,640 spend returning $5,100 sales at a loss after COGS+fees on these SKUs",
+      action:"Cut bids 30% and cap budgets on B0ASIN0003 / 0007 / 0011; if still unprofitable in 14 days, pause." },
+    { id:"H-04", severity:"medium", area:"Placement", eta_days:5,
+      title:"Top-of-search converts 2.1× rest-of-search but has no bid boost",
+      impact:"Leaving ranked top-of-search volume on the table on 6 manual campaigns",
+      action:"Apply a +40 to 60% Top-of-search placement multiplier on the 6 campaigns where ToS ROAS > account average." }
+  ],
+  quick_wins: [
+    "Add 41 zero-order high-spend terms as negatives (~10 min, recovers ~$1,300/mo)",
+    "Switch 4 Auto campaigns from Up-and-Down to Down-Only bidding (2 min)",
+    "Raise 2 budget-capped winning campaigns from $20→$50/day (2 min)",
+    "Link Brand Store as the Sponsored Brands landing page on 3 campaigns (5 min)"
+  ],
+  harvest: {
+    promote: [
+      { term:"magnesium glycinate 400mg", campaign:"SP-Auto-Supps", clicks:212, orders:31, acos:"19%", action:"→ Manual Exact" },
+      { term:"sleep magnesium capsules",  campaign:"SP-Auto-Supps", clicks:148, orders:18, acos:"24%", action:"→ Manual Exact" }
+    ],
+    negate: [
+      { term:"magnesium oil spray", campaign:"SP-Auto-Supps", spend:"$214", clicks:191, orders:0, reason:"Wrong format, 0 orders on 191 clicks" },
+      { term:"magnesium for plants", campaign:"SP-Auto-Supps", spend:"$96",  clicks:88,  orders:0, reason:"Irrelevant intent" }
+    ]
+  },
+  asin_table: [
+    { asin:"B0ASIN0001", title:"Magnesium Glycinate 120ct", spend:"$9,420", sales:"$41,300", acos:"22.8%", tacos:"7.1%", target_acos:"28%", verdict:"good" },
+    { asin:"B0ASIN0003", title:"Magnesium Spray 8oz",       spend:"$1,180", sales:"$2,050",  acos:"57.6%", tacos:"19.4%",target_acos:"28%", verdict:"bad" },
+    { asin:"B0ASIN0007", title:"Magnesium Gummies 60ct",    spend:"$980",   sales:"$1,810",  acos:"54.1%", tacos:"16.0%",target_acos:"28%", verdict:"bad" }
+  ],
+  funnel: {
+    diagnosis: "CTR is on-benchmark and CVR is healthy (9.1%), so the leak is targeting relevance, not the listing. Spend on irrelevant search terms is the problem, not main image / price / reviews.",
+    rows: [
+      { metric:"CTR", value:"0.38%", benchmark:"~0.40%", read:"On benchmark, main image and relevance are fine." },
+      { metric:"CVR", value:"9.1%",  benchmark:"8 to 12%", read:"Healthy, the listing converts clicks fine." },
+      { metric:"Wasted-spend share", value:"22%", benchmark:"<10%", read:"High, a relevance and negatives problem." }
+    ]
+  },
+  ad_types: [
+    { type:"Sponsored Products", score:72, notes:["83% of spend","Auto+Manual present on top ASINs","Harvest cadence is the gap"] },
+    { type:"Sponsored Brands",   score:72, notes:["1 HSA + 1 Video live","Store linked on 2 of 5 campaigns","Test SBV on top 5 ASINs"] },
+    { type:"Sponsored Display",  score:60, notes:["Audience + contextual mixed in one campaign","Split retargeting from contextual"] },
+    { type:"Sponsored TV / DSP", score:null, notes:["Not running. Consider once monthly spend is above $15k and creative is ready"] }
+  ],
+  action_plan: [
+    { priority:1, action:"Negative-keyword sweep + harvest the 23 converters", owner:"PPC", eta:"This week", impact:"Recover ~$1,300/mo, lower ACOS ~4pp" },
+    { priority:2, action:"Bid/budget cut on 3 unprofitable ASINs, re-check in 14d", owner:"PPC", eta:"48h", impact:"Stop ~$900/mo loss" },
+    { priority:3, action:"Top-of-search placement multipliers on 6 campaigns", owner:"PPC", eta:"This week", impact:"Capture ranked ToS volume" },
+    { priority:4, action:"Split Sponsored Display audience vs contextual", owner:"PPC", eta:"30 days", impact:"Cleaner SD attribution & scaling" }
+  ],
+  data_provided: ["SP Search Term Report (90d)","SP Campaign Report (90d)","SP Targeting Report","Business Reports (ASIN traffic)"],
+  data_missing: ["Placement Report","Sponsored Brands reports","Brand Analytics, Search Query Performance","Bulk Operations file"]
+};
+/* === REPORT_DATA_END === */
+
+/* ------------------------------------------------------------------ */
+/* Rendering. Pure, no deps. Hides any section without data.            */
+/* ------------------------------------------------------------------ */
+(function(){
+  const D = REPORT_DATA, E = (t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+  const app = document.getElementById('app');
+  const C = {good:'var(--good)',warning:'var(--warn)',bad:'var(--bad)',info:'var(--info)'};
+  const gradeColor = g => ({A:'var(--good)',B:'#5FA8D3',C:'var(--warn)',D:'#E07B39',F:'var(--bad)'}[g]||'var(--muted)');
+  const ic = p => `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const ICONS = {
+    bolt:'<path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z"/>',
+    target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    list:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+    alert:'<path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+    check:'<polyline points="20 6 9 17 4 12"/>',
+    grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+    funnel:'<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+    chart:'<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
+    folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+    flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+    shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>'
+  };
+  const sec = (icon,title,note,help) => {
+    const wrap = E('div');
+    const h = E('div','sec-head');
+    h.appendChild(E('div','ic',`<span style="color:var(--accent-2)">${ic(ICONS[icon])}</span>`));
+    h.appendChild(E('h2',null,title));
+    if(note) h.appendChild(E('div','note',note));
+    wrap.appendChild(h);
+    if(help) wrap.appendChild(E('div','sec-help',help));
+    return wrap;
+  };
+  const has = v => Array.isArray(v) ? v.length>0 : (v!=null && v!=='');
+
+  /* ---- masthead ---- */
+  const m = D.meta||{};
+  const mh = E('div','masthead');
+  mh.innerHTML = `
+    <div class="brandline"><div class="logo">a</div><div style="font-size:12px;color:#C9D3DE;letter-spacing:.4px;text-transform:uppercase">Amazon Ads · Health Report</div></div>
+    <h1>${m.brand||'Amazon Advertising Account'}</h1>
+    <div class="sub">${[m.marketplace,m.account_type,m.category].filter(Boolean).join('  ·  ')}</div>
+    <div class="metagrid">
+      ${m.date_range?`<div>Reporting period: <b>${m.date_range}</b></div>`:''}
+      ${m.generated?`<div>Generated: <b>${m.generated}</b></div>`:''}
+      ${D.confidence?`<div>Report confidence: <b>${D.confidence.score}% · ${D.confidence.level}</b></div>`:''}
+    </div>`;
+  app.appendChild(mh);
+
+  /* ---- score hero ---- */
+  if(D.health){
+    const hero = E('div','hero');
+    const score = Math.max(0,Math.min(100, D.health.score??0));
+    const r=80, circ=2*Math.PI*r, off=circ*(1-score/100);
+    const col = score>=90?'var(--good)':score>=75?'#5FA8D3':score>=60?'var(--warn)':score>=40?'#E07B39':'var(--bad)';
+    const g = E('div','card gauge-card');
+    g.innerHTML = `
+      <div class="gauge">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle cx="90" cy="90" r="${r}" fill="none" stroke="#EEF1F4" stroke-width="14"/>
+          <circle cx="90" cy="90" r="${r}" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round"
+            stroke-dasharray="${circ}" stroke-dashoffset="${off}"/>
+        </svg>
+        <div class="num"><div class="s">${score}</div><div class="o">/ 100</div></div>
+      </div>
+      <div class="grade-pill" style="background:${gradeColor(D.health.grade)}1f;color:${gradeColor(D.health.grade)}">Grade ${D.health.grade||'-'}</div>`;
+    const s = E('div','card summary-card');
+    s.innerHTML = `<h2><span style="color:var(--accent)">${ic(ICONS.flag)}</span> Executive summary</h2><p>${D.health.summary||''}</p>`;
+    hero.appendChild(g); hero.appendChild(s); app.appendChild(hero);
+  }
+
+  /* ---- how to read this report ---- */
+  if(has(D.how_to_read)){
+    const card=E('div','card howto');
+    card.innerHTML=`<h2><span style="color:var(--accent-2)">${ic(ICONS.flag)}</span> How to read this report</h2>
+      ${D.how_to_read_lede?`<p class="lede">${D.how_to_read_lede}</p>`:''}
+      <ol>${D.how_to_read.map(x=>`<li>${x}</li>`).join('')}</ol>`;
+    app.appendChild(card);
+  }
+
+  /* ---- report confidence / accuracy ---- */
+  if(D.confidence){
+    const cf=D.confidence, sc=Math.max(0,Math.min(100,cf.score??0));
+    const lvl=cf.level||(sc>=75?'High':sc>=50?'Medium':'Low');
+    const lcol=sc>=75?'var(--good)':sc>=50?'var(--warn)':'var(--bad)';
+    const lbg =sc>=75?'var(--good-bg)':sc>=50?'var(--warn-bg)':'var(--bad-bg)';
+    const s=E('section'); s.appendChild(sec('shield','Report confidence',' how much to trust this analysis','This score is about the DATA you uploaded, not your ads. A low number does not mean your account is bad. It means adding the files listed below would make the analysis sharper.'));
+    const card=E('div','card conf');
+    card.innerHTML=`
+      <div class="conf-top">
+        <div class="conf-num">${sc}%</div>
+        <span class="conf-lvl" style="background:${lbg};color:${lcol}">${lvl} confidence</span>
+        <div class="conf-meter"><div class="conf-track"><div class="conf-fill" style="width:${sc}%"></div></div></div>
+      </div>
+      ${cf.basis?`<div class="conf-basis">${cf.basis}</div>`:''}
+      ${has(cf.boosters)?`<div class="boost"><h3>Add these to raise accuracy</h3>
+        ${cf.boosters.map(b=>`<div class="b-row"><div class="b-item">${b.item}</div><div class="b-add">${b.adds||''}</div>${b.why?`<div class="b-why">${b.why}</div>`:''}</div>`).join('')}
+      </div>`:''}`;
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- KPI cards ---- */
+  if(has(D.kpis)){
+    const s=E('section'); s.appendChild(sec('chart','Key metrics vs benchmark',null,'Each card is one health number next to a typical benchmark. Green is fine, yellow needs a look, red needs action. Golden rule: judge ACOS against YOUR break-even (your profit margin), not against the average.'));
+    const grid=E('div','kpis');
+    D.kpis.forEach(k=>{
+      const card=E('div','kpi'+(k.hint?' has-hint':''));
+      card.innerHTML=`<div class="dot" style="background:${C[k.status]||'var(--muted)'}"></div>
+        <div class="lab">${k.label}</div><div class="val">${k.value}</div>
+        <div class="bm">${k.benchmark||''}</div>${k.hint?`<div class="hint">${k.hint}</div>`:''}`;
+      grid.appendChild(card);
+    });
+    s.appendChild(grid); app.appendChild(s);
+  }
+
+  /* ---- category bars ---- */
+  if(has(D.categories)){
+    const s=E('section'); s.appendChild(sec('grid','Category scores',null,'Your overall score is built from these areas, weighted by how much each one affects money. The lowest bars are where the biggest gains are, so start there.'));
+    const card=E('div','card bars');
+    D.categories.forEach(c=>{
+      const sc=Math.max(0,Math.min(100,c.score??0));
+      const col=sc>=75?'var(--good)':sc>=60?'var(--warn)':'var(--bad)';
+      const row=E('div','bar-row');
+      row.innerHTML=`<div class="nm">${c.name} <small>(${c.weight}%)</small></div>
+        <div class="track"><div class="fill" style="width:${sc}%;background:${col}"></div></div>
+        <div class="sc" style="color:${col}">${sc}</div>`;
+      card.appendChild(row);
+    });
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- quick wins ---- */
+  if(has(D.quick_wins)){
+    const s=E('section'); s.appendChild(sec('bolt','Quick wins',' high impact · under 15 min each','Do these first. A few minutes each, fast payback, and none of them put your account at risk.'));
+    const card=E('div','card qw');
+    const ul=E('ul');
+    D.quick_wins.forEach(q=>{const li=E('li');li.innerHTML=`<span class="chk">${ic(ICONS.check)}</span><span>${q}</span>`;ul.appendChild(li);});
+    card.appendChild(ul); s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- findings ---- */
+  if(has(D.findings)){
+    const order={critical:0,high:1,medium:2,low:3};
+    const s=E('section'); s.appendChild(sec('alert','Findings',`${D.findings.length} issues`,'The problems we found, worst first. Each one shows the impact in plain dollars and the exact fix to make. Work top to bottom.'));
+    [...D.findings].sort((a,b)=>(order[a.severity]??9)-(order[b.severity]??9)).forEach(f=>{
+      const el=E('div','finding sev-'+f.severity);
+      el.innerHTML=`<div class="sev">${f.severity}</div>
+        <div><h3>${f.title}</h3>
+          <div class="meta">${[f.id,f.area,(f.eta_days!=null?('fix in '+f.eta_days+'d'):'')].filter(Boolean).join(' · ')}</div>
+          ${f.impact?`<div class="row"><b>Impact:</b> ${f.impact}</div>`:''}
+          ${f.action?`<div class="row"><b>Action:</b> ${f.action}</div>`:''}
+        </div>`;
+      s.appendChild(el);
+    });
+    app.appendChild(s);
+  }
+
+  /* ---- harvest tables ---- */
+  if(D.harvest && (has(D.harvest.promote)||has(D.harvest.negate))){
+    const s=E('section'); s.appendChild(sec('target','Search-term harvest plan',null,'Two lists pulled from your Search Term report. Promote the winners on the left into their own exact-match campaigns so they get more budget. Add the wasted terms on the right as negatives so you stop paying for clicks that never sell. Repeat this weekly.'));
+    if(has(D.harvest.promote)){
+      s.appendChild(E('h3',null,'<span style="font-size:13px;color:var(--good);margin:4px 0;display:block">Promote to Manual Exact (winning terms)</span>'));
+      const w=E('div','tbl-wrap');
+      w.innerHTML=`<table><thead><tr><th>Search term</th><th>Source campaign</th><th class="num">Clicks</th><th class="num">Orders</th><th class="num">ACOS</th><th>Action</th></tr></thead><tbody>
+        ${D.harvest.promote.map(r=>`<tr><td>${r.term}</td><td>${r.campaign}</td><td class="num">${r.clicks}</td><td class="num">${r.orders}</td><td class="num">${r.acos}</td><td><span class="tag good">${r.action}</span></td></tr>`).join('')}
+      </tbody></table>`;
+      s.appendChild(w);
+    }
+    if(has(D.harvest.negate)){
+      s.appendChild(E('h3',null,'<span style="font-size:13px;color:var(--bad);margin:14px 0 4px;display:block">Add as negatives (wasted spend)</span>'));
+      const w=E('div','tbl-wrap');
+      w.innerHTML=`<table><thead><tr><th>Search term</th><th>Campaign</th><th class="num">Spend</th><th class="num">Clicks</th><th class="num">Orders</th><th>Why</th></tr></thead><tbody>
+        ${D.harvest.negate.map(r=>`<tr><td>${r.term}</td><td>${r.campaign}</td><td class="num">${r.spend}</td><td class="num">${r.clicks}</td><td class="num">${r.orders}</td><td>${r.reason}</td></tr>`).join('')}
+      </tbody></table>`;
+      s.appendChild(w);
+    }
+    app.appendChild(s);
+  }
+
+  /* ---- ASIN profitability ---- */
+  if(has(D.asin_table)){
+    const s=E('section'); s.appendChild(sec('list','ACOS by ASIN: profitability',null,'Each product judged against its target ACOS. Green makes money, red loses it. For a red row, lower the bid or pause it until the listing converts better, then turn it back on.'));
+    const w=E('div','tbl-wrap');
+    w.innerHTML=`<table><thead><tr><th>ASIN</th><th>Product</th><th class="num">Spend</th><th class="num">Ad sales</th><th class="num">ACOS</th><th class="num">TACOS</th><th class="num">Target</th><th>Verdict</th></tr></thead><tbody>
+      ${D.asin_table.map(r=>`<tr><td style="font-family:var(--mono)">${r.asin}</td><td>${r.title||''}</td><td class="num">${r.spend}</td><td class="num">${r.sales}</td><td class="num">${r.acos}</td><td class="num">${r.tacos||'-'}</td><td class="num">${r.target_acos||'-'}</td><td><span class="tag ${r.verdict==='good'?'good':r.verdict==='warn'?'warn':'bad'}">${r.verdict==='good'?'Profitable':r.verdict==='warn'?'Watch':'Unprofitable'}</span></td></tr>`).join('')}
+    </tbody></table>`;
+    s.appendChild(w); app.appendChild(s);
+  }
+
+  /* ---- funnel diagnosis + ad types ---- */
+  if(D.funnel || has(D.ad_types)){
+    const s=E('section'); s.appendChild(sec('funnel','Funnel diagnosis & ad-type breakdown',null,'This answers the key question: is the problem your ADS or your LISTING. If clicks are cheap but few people buy, spending more on ads will not help. Fix the listing (images, price, reviews) first.'));
+    const g=E('div','grid2');
+    if(D.funnel){
+      const p=E('div','card panel');
+      p.innerHTML=`<h3>Ad problem vs listing problem</h3>${D.funnel.diagnosis?`<div class="read">${D.funnel.diagnosis}</div>`:''}
+        ${has(D.funnel.rows)?`<div class="tbl-wrap" style="margin-top:10px;border:0;box-shadow:none"><table><thead><tr><th>Signal</th><th class="num">Value</th><th class="num">Benchmark</th><th>Read</th></tr></thead><tbody>
+        ${D.funnel.rows.map(r=>`<tr><td>${r.metric}</td><td class="num">${r.value}</td><td class="num">${r.benchmark}</td><td style="white-space:normal">${r.read}</td></tr>`).join('')}</tbody></table></div>`:''}`;
+      g.appendChild(p);
+    }
+    if(has(D.ad_types)){
+      const p=E('div','card panel');
+      p.innerHTML=`<h3>By ad type</h3>`+D.ad_types.map(t=>{
+        const sc=t.score==null?'<span class="tag info">n/a</span>':`<span class="tag ${t.score>=75?'good':t.score>=60?'warn':'bad'}">${t.score}</span>`;
+        return `<div style="padding:8px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:13px;color:var(--ink)">${t.type}</b> ${sc}</div>
+        ${has(t.notes)?`<ul style="margin:4px 0 0;padding-left:16px;font-size:12px;color:var(--ink-2)">${t.notes.map(n=>`<li>${n}</li>`).join('')}</ul>`:''}</div>`;
+      }).join('');
+      g.appendChild(p);
+    }
+    s.appendChild(g); app.appendChild(s);
+  }
+
+  /* ---- action plan ---- */
+  if(has(D.action_plan)){
+    const s=E('section'); s.appendChild(sec('flag','Prioritized action plan',null,'Your to-do list, in order. If you only do one thing this week, do number 1. Each item names who should do it and the payoff to expect.'));
+    const card=E('div','card panel');
+    [...D.action_plan].sort((a,b)=>(a.priority||9)-(b.priority||9)).forEach(a=>{
+      const row=E('div','ap-row p'+(a.priority||4));
+      row.innerHTML=`<div class="t">${a.priority? a.priority+'. ':''}${a.action}</div>
+        <div class="d">${[a.owner&&('Owner: '+a.owner),a.eta&&('ETA: '+a.eta),a.impact&&('Impact: '+a.impact)].filter(Boolean).join('  ·  ')}</div>`;
+      card.appendChild(row);
+    });
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- data coverage ---- */
+  if(has(D.data_provided)||has(D.data_missing)){
+    const s=E('section'); s.appendChild(sec('folder','Data coverage',null,'Green files were used in this report. Red files were not provided. Adding the red ones next time gives a more accurate and complete picture.'));
+    const card=E('div','card panel');
+    const chips=E('div','chips');
+    (D.data_provided||[]).forEach(d=>chips.appendChild(E('span','chip have',ic(ICONS.check)+' '+d)));
+    (D.data_missing||[]).forEach(d=>chips.appendChild(E('span','chip miss','+ '+d+' (not provided)')));
+    card.appendChild(chips);
+    if(has(D.data_missing)) card.appendChild(E('div','read','Adding the missing reports above would raise confidence. See the data-collection guide for how to export each.'));
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- glossary ---- */
+  if(has(D.glossary)){
+    const s=E('section'); s.appendChild(sec('list','Plain-English glossary',null,'Quick definitions for the terms in this report, in everyday language.'));
+    const card=E('div','card gloss');
+    D.glossary.forEach(g=>{
+      const row=E('div','g-row');
+      row.innerHTML=`<div class="g-term">${g.term}</div><div class="g-def">${g.plain}</div>`;
+      card.appendChild(row);
+    });
+    s.appendChild(card); app.appendChild(s);
+  }
+
+  /* ---- disclaimer + authorship + footer ---- */
+  if(m.analyst_note) app.appendChild(E('div','disclaimer',m.analyst_note));
+  const auth=E('div','author');
+  auth.innerHTML=`<span class="av">OG</span><span>Built by <a href="https://ggrn.pro" target="_blank" rel="noopener">Oleg Gagarin · ggrn.pro</a></span>`;
+  app.appendChild(auth);
+  app.appendChild(E('footer',null,'Amazon Ads Analyzer · Benchmarks are directional averages. Your margin and stage determine the right targets · This is an analysis aid, not financial advice. Not affiliated with Amazon.'));
+})();
+</script>
+</body>
+</html>

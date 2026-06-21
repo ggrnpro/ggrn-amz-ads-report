@@ -1,0 +1,485 @@
+{
+  "meta": {
+    "brand": "ErgoNest",
+    "marketplace": "Amazon.com (US)",
+    "account_type": "Seller, Brand Registered",
+    "category": "Home & Office, Bamboo Foot Rest (single ASIN, B0SAMPLE01, $34.95)",
+    "date_range": "About May 19 to Jun 17, 2026 (roughly 30 days, launch phase)",
+    "generated": "2026-06-21",
+    "analyst_note": "Demo report. The brand, product, and ASINs are anonymized sample data, not a real account. It shows what the skill produces for a single-product launch. The only modeling assumption is a 40% break-even ACOS, because no product cost was supplied."
+  },
+  "health": {
+    "score": 56,
+    "grade": "D",
+    "summary": "You are about four weeks into a launch with one product, so do not panic about the grade. Right now the ads lose money in aggregate (ACOS 70.6%, so roughly $70 of ad cost per $100 of ad sales). The cause is not your bidding, it is that the listing converts too few of the clicks you are buying, almost certainly because the product has no reviews yet. Your campaign structure is actually good and you already have clear winners. Fix conversion (get reviews), stop two bleeding campaigns, and bring your $2.44 click cost down, and this account turns around fast."
+  },
+  "confidence": {
+    "score": 70,
+    "level": "Medium",
+    "basis": "You uploaded six useful files (Campaign, Advertised Product, Search Term, Search Catalog Performance, Search Query Performance, and Brand Trends), so the ad picture is clear. The main missing piece is your product cost, which is why the break-even line is an assumption.",
+    "boosters": [
+      {
+        "item": "Product cost sheet (COGS, fees, sell price)",
+        "adds": "+14%",
+        "why": "Turns the assumed 40% break-even ACOS into your exact number, so every too high / too low call becomes precise instead of estimated."
+      },
+      {
+        "item": "Helium 10 or Jungle Scout keyword export",
+        "adds": "+8%",
+        "why": "Adds search volume and competition so we can size the ranking prize on terms like foot rest under desk (204k searches/quarter) and pick harvest targets with confidence."
+      },
+      {
+        "item": "Two or three more weeks of data",
+        "adds": "+6%",
+        "why": "The account is only about 30 days old, so many keywords have too few clicks to judge yet. More time makes the harvest and negative calls safer."
+      }
+    ]
+  },
+  "how_to_read_lede": "This report grades your Amazon ads from 0 to 100 and tells you, in plain English, what to do next. You are early in a launch, so read it as a roadmap, not a verdict.",
+  "how_to_read": [
+    "Start at the top. The score and the summary tell you where you stand in one breath.",
+    "Every section has a grey line under its title that explains what the block means and what to do with it.",
+    "The <b>Action plan</b> near the bottom is your ordered to-do list. If you only do one thing this week, do number 1.",
+    "Red is not failure. It is where the easy wins are. A normal launch looks a lot like this."
+  ],
+  "categories": [
+    {
+      "name": "Profitability (ACOS vs target)",
+      "weight": 22,
+      "score": 45
+    },
+    {
+      "name": "Wasted spend / negatives",
+      "weight": 18,
+      "score": 55
+    },
+    {
+      "name": "Harvesting & match-type structure",
+      "weight": 14,
+      "score": 65
+    },
+    {
+      "name": "Account & campaign structure",
+      "weight": 12,
+      "score": 80
+    },
+    {
+      "name": "Funnel health (CTR & CVR)",
+      "weight": 12,
+      "score": 45
+    },
+    {
+      "name": "Bid & placement optimization",
+      "weight": 8,
+      "score": 50
+    },
+    {
+      "name": "Budget pacing",
+      "weight": 6,
+      "score": 70
+    },
+    {
+      "name": "Branded vs non-branded & NTB",
+      "weight": 5,
+      "score": 60
+    },
+    {
+      "name": "Sponsored Brands / Display use",
+      "weight": 3,
+      "score": 40
+    }
+  ],
+  "kpis": [
+    {
+      "label": "ACOS",
+      "value": "70.6%",
+      "benchmark": "assumed break-even about 40%",
+      "status": "bad",
+      "hint": "You spend more on ads than the sale can carry. High is normal in a launch, but this is the number to drive down."
+    },
+    {
+      "label": "ROAS",
+      "value": "1.42x",
+      "benchmark": "need about 2.5x to break even",
+      "status": "bad",
+      "hint": "$1.42 back per $1 spent. The flip side of ACOS."
+    },
+    {
+      "label": "CPC",
+      "value": "$2.44",
+      "benchmark": "profitable is about $1.25",
+      "status": "bad",
+      "hint": "You pay almost double what a $34.95 product at 9% conversion can afford. Biggest single lever after reviews."
+    },
+    {
+      "label": "CTR",
+      "value": "0.35%",
+      "benchmark": "healthy about 0.4 to 0.5%",
+      "status": "warning",
+      "hint": "A bit low. Test a stronger main image and check your price."
+    },
+    {
+      "label": "CVR (ads)",
+      "value": "9.25%",
+      "benchmark": "Home/Office 10 to 13%",
+      "status": "warning",
+      "hint": "Listing search conversion is only 5.56%. People add to cart then leave. Reviews are the fix."
+    },
+    {
+      "label": "Ad spend",
+      "value": "$1,502",
+      "benchmark": "about 30 days",
+      "status": "info",
+      "hint": ""
+    },
+    {
+      "label": "Ad sales",
+      "value": "$2,128",
+      "benchmark": "57 orders",
+      "status": "info",
+      "hint": ""
+    },
+    {
+      "label": "TACOS",
+      "value": "n/a",
+      "benchmark": "need total sales to calculate",
+      "status": "info",
+      "hint": "Upload Business Reports total sales and we can track the real long-term health number."
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-01",
+      "severity": "critical",
+      "area": "Listing / conversion",
+      "eta_days": 1,
+      "title": "Your listing converts too few clicks, almost certainly because it has no reviews yet",
+      "impact": "Last week the listing got 14,356 search views, 72 clicks, 21 add-to-carts, but only 4 sales (5.56% conversion). People add to cart then leave. This inflates the ACOS of every single campaign, and no bid change can fix it.",
+      "action": "Enroll this ASIN in Amazon Vine today and aim for 15 or more reviews. While you wait, double-check the main image shows the rocking foot rest in use, and confirm $34.95 is competitive. Hypothesis to test: with 15 to 30 reviews, does conversion jump from 5.56% toward 10%? That alone would roughly halve your ACOS."
+    },
+    {
+      "id": "F-02",
+      "severity": "high",
+      "area": "Bidding / CPC",
+      "eta_days": 1,
+      "title": "You pay $2.44 per click, about double what is profitable",
+      "impact": "At 9% conversion and a $34.95 price, the most you can pay per click and still aim for a 40% ACOS is about $1.25. Paying $2.44 is the main reason account ACOS is 70%.",
+      "action": "Switch the discovery campaigns (Bamboo Foot Rest - Subs and - Broad) to Dynamic bids, down only. Then lower bids 20 to 30% on any keyword whose ACOS is above your target. Keep higher bids only on the few terms that actually convert (see the harvest list)."
+    },
+    {
+      "id": "F-03",
+      "severity": "high",
+      "area": "Wasted spend",
+      "eta_days": 1,
+      "title": "One campaign and one search term are your worst money leaks",
+      "impact": "The campaign foot stool under desk - Exact - Rnk spent $143.70 at 206% ACOS. The search term foot stool under desk took 31 clicks and $132 for a single sale (378% ACOS). That term does not convert for you.",
+      "action": "Pause that ranking campaign (or cut its bid in half), and add foot stool under desk as a negative in your broad and auto campaigns so you stop paying for it elsewhere."
+    },
+    {
+      "id": "F-04",
+      "severity": "medium",
+      "area": "Discovery campaigns",
+      "eta_days": 7,
+      "title": "Your discovery campaigns run over target, which is fine if you prune them weekly",
+      "impact": "Subs ($235, 105% ACOS), Broad ($273, 82%), and ergonomic foot rest under desk ($138, 134%) are over break-even. Together they are about half your spend. They are doing their job (finding keywords), but they need a weekly cleanup.",
+      "action": "Keep them on, but cap their bids and run the weekly harvest-and-negative routine in the harvest section below. Move the keywords they prove into their own exact campaigns."
+    },
+    {
+      "id": "F-05",
+      "severity": "medium",
+      "area": "Scaling winners",
+      "eta_days": 7,
+      "title": "Your winners are under-funded",
+      "impact": "rocking foot rest under desk (27% ACOS), office foot rest under desk (25%), Close (45%), Phrase (48%), and several converting competitor products (ASIN B0RIVAL001 made 5 sales at 54%) are profitable or close to it, but small.",
+      "action": "Give these more budget. Build a dedicated exact-match campaign for office foot rest under desk and rocking foot rest under desk, and a product-targeting campaign aimed at the 3 to 5 competitor ASINs that already convert."
+    },
+    {
+      "id": "F-06",
+      "severity": "low",
+      "area": "Organic / visibility",
+      "eta_days": 30,
+      "title": "You are invisible in the category, which is normal at week 4",
+      "impact": "On every big search term (foot rest 211k searches, foot rest under desk 204k, foot stool under desk 78k) your brand share of impressions and purchases is 0%. All your sales are paid right now.",
+      "action": "This is expected for a new launch. Keep ranking spend on the head terms that convert, get reviews, and organic rank will start to follow. Re-check this in 30 days."
+    }
+  ],
+  "quick_wins": [
+    "Pause foot stool under desk - Exact - Rnk (206% ACOS), your worst leak (about 2 min)",
+    "Add foot stool under desk, office desk accessories, and cute desk accessories as negatives (about 5 min)",
+    "Switch the Subs and Broad campaigns to Dynamic bids, down only (about 2 min)",
+    "Enroll the ASIN in Amazon Vine to start getting reviews (about 10 min, biggest long-term win)",
+    "Promote office foot rest under desk (25% ACOS) into its own exact-match campaign (about 5 min)"
+  ],
+  "harvest": {
+    "promote": [
+      {
+        "term": "office foot rest under desk",
+        "campaign": "Subs (auto)",
+        "clicks": 13,
+        "orders": 4,
+        "acos": "25%",
+        "action": "To Manual Exact"
+      },
+      {
+        "term": "rocking foot rest under desk",
+        "campaign": "Phrase",
+        "clicks": 10,
+        "orders": 3,
+        "acos": "29%",
+        "action": "Fund existing exact"
+      },
+      {
+        "term": "office foot rest",
+        "campaign": "Broad",
+        "clicks": 6,
+        "orders": 2,
+        "acos": "15%",
+        "action": "To Manual Exact"
+      },
+      {
+        "term": "feet support under desk",
+        "campaign": "Broad",
+        "clicks": 11,
+        "orders": 2,
+        "acos": "45%",
+        "action": "To Manual Exact"
+      },
+      {
+        "term": "B0RIVAL001 (competitor ASIN)",
+        "campaign": "Subs (auto)",
+        "clicks": 47,
+        "orders": 5,
+        "acos": "54%",
+        "action": "To ASIN-target campaign"
+      },
+      {
+        "term": "B0RIVAL002 (competitor ASIN)",
+        "campaign": "ASIN - RFN",
+        "clicks": 6,
+        "orders": 2,
+        "acos": "13%",
+        "action": "To ASIN-target campaign"
+      },
+      {
+        "term": "B0RIVAL003 (competitor ASIN)",
+        "campaign": "ASIN - RFN",
+        "clicks": 17,
+        "orders": 2,
+        "acos": "38%",
+        "action": "To ASIN-target campaign"
+      }
+    ],
+    "negate": [
+      {
+        "term": "foot stool under desk",
+        "campaign": "Broad / Exact-Rnk",
+        "spend": "$132",
+        "clicks": 31,
+        "orders": 1,
+        "reason": "378% ACOS, your single worst term"
+      },
+      {
+        "term": "office desk accessories",
+        "campaign": "Subs (auto)",
+        "spend": "$14",
+        "clicks": 7,
+        "orders": 0,
+        "reason": "Not a foot rest shopper"
+      },
+      {
+        "term": "cute desk accessories",
+        "campaign": "Subs (auto)",
+        "spend": "$10",
+        "clicks": 6,
+        "orders": 0,
+        "reason": "Wrong intent"
+      },
+      {
+        "term": "foot rest for couch",
+        "campaign": "Broad",
+        "spend": "$5",
+        "clicks": 2,
+        "orders": 0,
+        "reason": "Different use, not under-desk"
+      },
+      {
+        "term": "wood walking pad",
+        "campaign": "Subs (auto)",
+        "spend": "$1",
+        "clicks": 1,
+        "orders": 0,
+        "reason": "Unrelated product"
+      }
+    ]
+  },
+  "asin_table": [
+    {
+      "asin": "B0SAMPLE01",
+      "title": "Bamboo Foot Rest for Under Desk ($34.95)",
+      "spend": "$1,502",
+      "sales": "$2,128",
+      "acos": "70.6%",
+      "tacos": "n/a",
+      "target_acos": "~40% (assumed)",
+      "verdict": "bad"
+    }
+  ],
+  "funnel": {
+    "diagnosis": "The bottleneck is your LISTING, not your bidding. Ads bring people to the page (72 clicks from 14,356 views last week), 21 add to cart, but only 4 buy. That is a 5.56% conversion rate, and the product shows no reviews yet. Shoppers adding to cart then leaving is the classic sign of too little trust. Bid tuning cannot fix this. Get reviews and the same ad spend will produce far more sales at a much lower ACOS.",
+    "rows": [
+      {
+        "metric": "CTR (ad clicks)",
+        "value": "0.35%",
+        "benchmark": "0.4 to 0.5%",
+        "read": "A little low. Test a stronger main image and confirm your price is competitive."
+      },
+      {
+        "metric": "CVR (search traffic)",
+        "value": "5.56%",
+        "benchmark": "10 to 13%",
+        "read": "Low. Clicks reach the page but do not buy. This is a listing and trust problem."
+      },
+      {
+        "metric": "Cart add to purchase",
+        "value": "19%",
+        "benchmark": "higher with reviews",
+        "read": "21 people added to cart, 4 bought. They hesitate at the final step, usually over reviews or price."
+      },
+      {
+        "metric": "Reviews",
+        "value": "none visible",
+        "benchmark": "aim 15+",
+        "read": "Top priority. Enroll in Amazon Vine. This single change lifts every metric above."
+      }
+    ]
+  },
+  "ad_types": [
+    {
+      "type": "Sponsored Products",
+      "score": 56,
+      "notes": [
+        "100% of your spend",
+        "Good structure: single-keyword ranking campaigns plus competitor ASIN targeting",
+        "Winners: rocking / office foot rest under desk, converting competitor ASINs",
+        "Bleeders: foot stool under desk, the Subs auto campaign"
+      ]
+    },
+    {
+      "type": "Sponsored Brands",
+      "score": null,
+      "notes": [
+        "Not running. Once you have a Brand Store and a few reviews, a Brand headline ad defends your name cheaply"
+      ]
+    },
+    {
+      "type": "Sponsored Display",
+      "score": null,
+      "notes": [
+        "Not running. Useful later to retarget the cart-adders who did not buy"
+      ]
+    },
+    {
+      "type": "Sponsored TV / DSP",
+      "score": null,
+      "notes": [
+        "Too early. Ignore until you are profitable and scaling"
+      ]
+    }
+  ],
+  "action_plan": [
+    {
+      "priority": 1,
+      "action": "Get reviews: enroll the ASIN in Amazon Vine, aim for 15 or more",
+      "owner": "You / brand",
+      "eta": "Today",
+      "impact": "The single biggest lever on conversion and ACOS"
+    },
+    {
+      "priority": 2,
+      "action": "Stop the worst leak: pause foot stool under desk - Exact - Rnk and negate that term",
+      "owner": "PPC",
+      "eta": "Today",
+      "impact": "Stops about $140/mo of clear loss"
+    },
+    {
+      "priority": 3,
+      "action": "Lower CPC: set Subs and Broad to down-only, cut over-target bids 20 to 30%",
+      "owner": "PPC",
+      "eta": "Today",
+      "impact": "Pulls account ACOS from about 70% toward 50%"
+    },
+    {
+      "priority": 4,
+      "action": "Fund the winners: dedicated exact campaigns for the converting terms, plus an ASIN-target campaign for the 3 to 5 competitor ASINs that convert",
+      "owner": "PPC",
+      "eta": "This week",
+      "impact": "More sales at 25 to 50% ACOS"
+    },
+    {
+      "priority": 5,
+      "action": "Set a weekly Monday routine: harvest converters to exact, add clearly-irrelevant terms as negatives",
+      "owner": "PPC",
+      "eta": "Weekly",
+      "impact": "ACOS drifts down, organic rank climbs over time"
+    },
+    {
+      "priority": 6,
+      "action": "Give it 30 to 60 days and track TACOS and organic rank, not daily ACOS",
+      "owner": "You / brand",
+      "eta": "Ongoing",
+      "impact": "Keeps you from over-reacting during a normal launch"
+    }
+  ],
+  "glossary": [
+    {
+      "term": "ACOS",
+      "plain": "Ad spend divided by ad sales. 70% means $70 of ad cost for every $100 of ad sales. Lower is more efficient. Always compare it to your own profit margin, not to other sellers."
+    },
+    {
+      "term": "Break-even ACOS",
+      "plain": "The ACOS where you make exactly $0 profit. It equals your profit margin before ads. Below it you profit, above it you lose. We assumed 40% because you have not shared your costs yet."
+    },
+    {
+      "term": "ROAS",
+      "plain": "The flip side of ACOS. Sales divided by ad spend. 1.42x means $1.42 back for every $1 spent."
+    },
+    {
+      "term": "TACOS",
+      "plain": "Total ad spend divided by ALL sales, ads plus organic. The real long-term health number. We could not calculate it without your total sales."
+    },
+    {
+      "term": "CTR",
+      "plain": "Click-through rate. Of the people who saw your ad, how many clicked. Driven by your main image, title, and price."
+    },
+    {
+      "term": "CVR",
+      "plain": "Conversion rate. Of the people who clicked, how many bought. Driven by your listing: reviews, price, images, content."
+    },
+    {
+      "term": "CPC",
+      "plain": "Cost per click. What you pay each time someone clicks your ad. Yours is high for a $34.95 product."
+    },
+    {
+      "term": "Negative keyword",
+      "plain": "A search term you block so your ad stops showing for it. Used to cut wasted spend."
+    },
+    {
+      "term": "Harvest",
+      "plain": "Taking a search term that already made sales and giving it its own exact-match campaign so it gets more budget and control."
+    }
+  ],
+  "data_provided": [
+    "Campaign report",
+    "Advertised Product report",
+    "Search Term report",
+    "Search Catalog Performance",
+    "Search Query Performance (Brand view)",
+    "Brand Trends"
+  ],
+  "data_missing": [
+    "Product cost / COGS sheet",
+    "Targeting report",
+    "Placement report",
+    "A few more weeks of data"
+  ]
+}

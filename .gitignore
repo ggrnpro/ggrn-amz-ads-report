@@ -1,0 +1,19 @@
+# Generated analysis outputs (the skill writes these into the working directory)
+/report-data.json
+/AMAZON-ADS-REPORT.html
+
+# Python
+__pycache__/
+*.pyc
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Playwright / preview artifacts
+.playwright-mcp/
+
+# Harness / scheduler artifacts
+.claude/
