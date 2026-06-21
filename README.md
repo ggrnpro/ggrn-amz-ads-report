@@ -1,116 +1,118 @@
 # Amazon Ads Analyzer (ggrn-amz-ads-report)
 
-Read more Russian below. [Русская версия ниже](README.ru.md).
+[English version](README.en.md).
 
-Turn your Amazon advertising reports into one clean HTML health report. You
-upload what you have (exported reports, or even a screenshot), and you get back a
-single self-contained HTML page that scores the account out of 100, compares your
-metrics to 2026 benchmarks, lists the issues in priority order, and hands you a
-search-term harvest and negatives plan you can act on the same day.
+Превращает ваши рекламные отчёты Amazon в один аккуратный HTML-отчёт о здоровье
+рекламы. Вы загружаете то, что есть (выгруженные отчёты или даже скриншот), а на
+выходе получаете одну самодостаточную HTML-страницу: она оценивает аккаунт по
+шкале от 0 до 100, сравнивает ваши метрики с бенчмарками 2026 года, перечисляет
+проблемы по приоритету и выдаёт готовый план по сбору поисковых запросов и
+минус-словам, который можно применить в тот же день.
 
-It is built as a Claude skill (an `Agent Skill`, the `SKILL.md` format). It runs
-locally, reads only the data you give it, and never logs into Amazon or changes
-your campaigns. The report it produces makes no external network requests, so you
-can email it to a client without anything phoning home.
+Это навык для Claude (формат `SKILL.md`, так называемый Agent Skill). Работает
+локально, читает только те данные, что вы дали, не входит в Amazon и не меняет
+ваши кампании. Готовый отчёт не делает никаких сетевых запросов, поэтому его можно
+отправить клиенту, ничего никуда не утечёт.
 
-**See a live demo report:** [open the rendered example](https://htmlpreview.github.io/?https://github.com/ggrnpro/ggrn-amz-ads-report/blob/main/examples/demo-report.html)
-(or the raw file: [`examples/demo-report.html`](examples/demo-report.html)). It is a
-single-product launch with anonymized sample data.
+**Посмотреть демо-отчёт:** [открыть готовый пример](https://htmlpreview.github.io/?https://github.com/ggrnpro/ggrn-amz-ads-report/blob/main/examples/demo-report.html)
+(или сам файл: [`examples/demo-report.html`](examples/demo-report.html)). Это запуск
+одного товара на обезличенных данных.
 
-## What you get
+## Что вы получаете
 
-- A 0-100 health score with a letter grade and a plain-language summary.
-- A data-confidence score that tells you how much to trust the result, plus the
-  exact files to add to raise it.
-- KPI cards (ACOS, TACOS, ROAS, CTR, CVR, CPC, spend, sales) colored against the
-  benchmark, not just printed.
-- Prioritized findings, each with a quantified impact and a concrete action.
-- Quick wins you can do in under fifteen minutes.
-- A search-term harvest plan: which terms to promote to exact match, which to add
-  as negatives, straight from your Search Term report.
-- An ACOS-by-ASIN profitability table that marks the unprofitable SKUs.
-- A funnel diagnosis that separates an ad problem from a listing problem, so you
-  do not waste money raising bids on a listing that does not convert.
-- A prioritized action plan with owners and timing.
+- Оценку здоровья аккаунта от 0 до 100 с буквенной оценкой и кратким понятным
+  выводом.
+- Оценку достоверности отчёта: насколько можно доверять результату и какие именно
+  файлы добавить, чтобы её поднять.
+- Карточки метрик (ACOS, TACOS, ROAS, CTR, CVR, CPC, расход, продажи),
+  раскрашенные по сравнению с бенчмарком, а не просто напечатанные.
+- Находки по приоритету: у каждой посчитанный эффект и конкретное действие.
+- Быстрые победы, которые делаются меньше чем за пятнадцать минут.
+- План сбора поисковых запросов: какие запросы перевести в точное соответствие, а
+  какие добавить в минус-слова, прямо из вашего отчёта Search Term.
+- Таблицу прибыльности ACOS по каждому ASIN с пометкой убыточных товаров.
+- Разбор воронки, который отделяет проблему рекламы от проблемы карточки, чтобы вы
+  не сливали деньги на ставки там, где не конвертит сама карточка.
+- План действий по приоритету с ответственными и сроками.
 
-The whole thing is one HTML file. Open it in any browser, print it to PDF, or
-send it on.
+Всё это один HTML-файл. Откройте его в любом браузере, сохраните в PDF или
+отправьте дальше.
 
-## Who it is for
+## Для кого это
 
-- Amazon sellers and brand owners who want a straight answer on whether their ads
-  are working, without learning a new dashboard.
-- Agencies and freelancers who want a fast, repeatable client-ready report.
-- Anyone new to Amazon PPC who does not yet know which report to pull. The skill
-  walks you through the exports step by step.
+- Продавцы и владельцы брендов на Amazon, которым нужен прямой ответ, работает ли
+  реклама, без изучения нового дашборда.
+- Агентства и фрилансеры, которым нужен быстрый и повторяемый отчёт для клиента.
+- Новички в Amazon PPC, которые ещё не знают, какой отчёт выгружать. Навык
+  проводит по выгрузкам шаг за шагом.
 
-## How it works
+## Как это работает
 
-1. You give it your data. Best is a Sponsored Products Search Term report plus
-   Campaign and Targeting reports. A single Campaign Manager screenshot works too.
-2. It computes every metric from the raw numbers, derives your break-even and
-   target ACOS from your margin, and scores nine categories.
-3. It writes `report-data.json` (the analysis) and builds
-   `AMAZON-ADS-REPORT.html` (the deliverable).
-4. It tells you the score, the single biggest lever, and which file to add next
-   for a more accurate read.
+1. Вы даёте данные. Лучше всего: отчёт Search Term по Sponsored Products плюс
+   отчёты Campaign и Targeting. Подойдёт и один скриншот Campaign Manager.
+2. Навык считает каждую метрику из сырых чисел, выводит вашу точку безубыточности
+   и целевой ACOS из вашей маржи и оценивает девять категорий.
+3. Он пишет `report-data.json` (сам анализ) и собирает `AMAZON-ADS-REPORT.html`
+   (готовый отчёт).
+4. Сообщает оценку, единственный самый сильный рычаг и какой файл добавить
+   следующим для более точного результата.
 
-It does not connect to Amazon, place bids, or post anything. Creating and editing
-campaigns stays in your hands.
+Навык не подключается к Amazon, не ставит ставки и ничего не публикует. Создание
+и правка кампаний остаются за вами.
 
-## What to upload
+## Что загружать
 
-You do not need everything. Upload what you have and add more later. The report
-states its own confidence and tells you which missing file would help most.
+Не нужно всё сразу. Загрузите то, что есть, остальное добавите позже. Отчёт сам
+показывает свою достоверность и подсказывает, какой недостающий файл поможет
+больше всего.
 
-Most useful, in order:
+Самое полезное, по порядку:
 
-1. Sponsored Products Search Term report (last 60 to 90 days). The single most
-   important file.
-2. Campaign, Advertised Product, Targeting, and Placement reports.
-3. The Bulk Operations file (your whole account structure in one sheet).
-4. Sponsored Brands and Sponsored Display reports, if you run them.
-5. Business Reports and, if you are brand-registered, Brand Analytics Search Query
-   Performance. These show whether a weak result is an ad problem or a listing
-   problem.
+1. Отчёт Search Term по Sponsored Products (за период от 60 до 90 дней). Самый
+   важный файл.
+2. Отчёты Campaign, Advertised Product, Targeting и Placement.
+3. Файл Bulk Operations (вся структура аккаунта в одной таблице).
+4. Отчёты Sponsored Brands и Sponsored Display, если они у вас крутятся.
+5. Business Reports и, если у вас есть Brand Registry, Brand Analytics Search Query
+   Performance. Они показывают, проблема в рекламе или в карточке.
 
-Bonus inputs that sharpen the report (optional):
+Бонусные данные, которые уточняют отчёт (по желанию):
 
-- A keyword export from Helium 10 (Cerebro, Magnet), Jungle Scout (Keyword
-  Scout), or Data Dive, with search volume and competition.
-- A product cost sheet (COGS, fees, sell price) so the target ACOS is exact
-  instead of a category default.
-- A competitor or listing screenshot, and your current inventory status.
+- Выгрузка ключевых слов из Helium 10 (Cerebro, Magnet), Jungle Scout (Keyword
+  Scout) или Data Dive, с объёмом поиска и конкуренцией.
+- Таблица себестоимости (COGS, комиссии, цена продажи), чтобы целевой ACOS был
+  точным, а не взятым по умолчанию для категории.
+- Скриншот карточки конкурента и текущий остаток на складе.
 
-The full click-by-click export guide, including where each report lives in the
-Amazon Ads console and Seller Central, is in
+Полный гид по выгрузкам, шаг за шагом, с указанием, где какой отчёт лежит в
+консоли Amazon Ads и в Seller Central, находится в файле
 [`references/data-collection-guide.md`](references/data-collection-guide.md).
 
-## Install
+## Установка
 
-One command, through the [skills.sh](https://skills.sh) installer. It detects your
-agent and drops the skill in the right place:
+Одна команда через установщик [skills.sh](https://skills.sh). Он сам определяет
+ваш агент и кладёт навык в нужную папку:
 
 ```bash
 npx skills add ggrnpro/ggrn-amz-ads-report
 ```
 
-That covers Claude Code, Codex, Cursor, Windsurf, Gemini CLI, Goose, GitHub Copilot,
-and the other agents skills.sh supports. To update later:
+Это покрывает Claude Code, Codex, Cursor, Windsurf, Gemini CLI, Goose, GitHub
+Copilot и другие агенты, которые поддерживает skills.sh. Обновить позже:
 
 ```bash
 npx skills update
 ```
 
-Then start your agent and say "analyze my Amazon ads" with your reports attached,
-or call the skill by name.
+Затем запустите своего агента и скажите «проанализируй мою рекламу на Amazon»,
+приложив отчёты, или вызовите навык по имени.
 
 
-### Manual install
+### Установка вручную
 
-If you would rather not use the installer, this is a plain Agent Skill: the folder
-holding `SKILL.md` is the skill. Clone it into your tool's skills directory, for
-example Claude Code:
+Если не хотите ставить через установщик, это обычный Agent Skill: навык это папка
+с файлом `SKILL.md`. Клонируйте её в папку навыков вашего инструмента, например для
+Claude Code:
 
 ```bash
 git clone https://github.com/ggrnpro/ggrn-amz-ads-report.git ~/.claude/skills/amazon-ads-analyzer
@@ -120,65 +122,65 @@ git clone https://github.com/ggrnpro/ggrn-amz-ads-report.git ~/.claude/skills/am
 git clone https://github.com/ggrnpro/ggrn-amz-ads-report.git "$env:USERPROFILE\.claude\skills\amazon-ads-analyzer"
 ```
 
-Other agents use their own skills folders (Codex `~/.codex/skills/`, Cursor
+У других агентов свои папки навыков (Codex `~/.codex/skills/`, Cursor
 `~/.cursor/skills/`, Windsurf `~/.windsurf/skills/`, Gemini `~/.gemini/skills/`,
-Goose `~/.config/goose/skills/`). Claude Desktop and claude.ai take the folder as
-an uploaded skill.
+Goose `~/.config/goose/skills/`). Claude Desktop и claude.ai принимают папку как
+загруженный навык.
 
-## Requirements
+## Требования
 
-- Python 3.10 or newer, for `scripts/build_report.py` (it ships with no
-  third-party dependencies).
-- For reading `.xlsx` exports, the analyzer uses a spreadsheet reader if one is
-  available. CSV exports need nothing extra.
+- Python 3.10 или новее для `scripts/build_report.py` (без сторонних
+  зависимостей).
+- Для чтения выгрузок `.xlsx` навык использует читалку таблиц, если она доступна.
+  Для CSV ничего дополнительно не нужно.
 
-## Generate a report by hand
+## Собрать отчёт вручную
 
-If you have the analysis JSON already, you can build the HTML directly:
+Если у вас уже есть JSON с анализом, соберите HTML напрямую:
 
 ```bash
 python scripts/build_report.py --data report-data.json --out AMAZON-ADS-REPORT.html
-# check the JSON shape first:
+# сначала проверьте форму JSON:
 python scripts/build_report.py --data report-data.json --validate
 ```
 
-See [`examples/demo-report-data.json`](examples/demo-report-data.json) and the
-HTML it produces, [`examples/demo-report.html`](examples/demo-report.html). The
-data shape is documented in
+В папке examples лежит [`demo-report-data.json`](examples/demo-report-data.json) и
+собранный из него HTML [`demo-report.html`](examples/demo-report.html). Форма
+данных описана в файле
 [`references/report-data-schema.md`](references/report-data-schema.md).
 
-## What is inside
+## Что внутри
 
 ```
 ggrn-amz-ads-report/
-  SKILL.md                       the skill: workflow and rules
-  assets/report-template.html    the HTML report template (renders from JSON)
-  scripts/build_report.py        injects analysis JSON into the template
+  SKILL.md                       сам навык: процесс и правила
+  assets/report-template.html    шаблон HTML-отчёта (рендерится из JSON)
+  scripts/build_report.py        вставляет JSON анализа в шаблон
   references/
-    data-collection-guide.md     what to upload, where, and how (newbie-first)
-    metrics-glossary.md          every metric, formula, and how to read it
-    benchmarks.md                2026 category and ad-type benchmarks
-    analysis-playbook.md         the checks, scoring rubric, and practitioner rules
-    whats-new-2026.md            current Amazon Ads features and renames
-    report-data-schema.md        the JSON contract for the report
-  examples/                      a demo report you can open
+    data-collection-guide.md     что загружать, откуда и как (для новичков)
+    metrics-glossary.md          каждая метрика, формула и как её читать
+    benchmarks.md                бенчмарки 2026 по категориям и типам рекламы
+    analysis-playbook.md         проверки, система оценки и правила практиков
+    whats-new-2026.md            текущие функции и переименования в Amazon Ads
+    report-data-schema.md        контракт JSON для отчёта
+  examples/                      готовый пример отчёта
 ```
 
-## Privacy
+## Приватность
 
-Everything runs on your machine through your agent tool. Your account data is not
-uploaded anywhere by this skill. The HTML report is fully self-contained and
-makes no network requests, so opening or sharing it does not leak data.
+Всё работает на вашей машине через ваш инструмент-агент. Данные аккаунта этот
+навык никуда не загружает. HTML-отчёт полностью самодостаточен и не делает сетевых
+запросов, поэтому открыть или переслать его безопасно.
 
-## Notes and limits
+## Оговорки и ограничения
 
-This is an analysis aid, not financial advice. Benchmarks are directional
-averages from third-party datasets; your margin and stage decide the right
-targets. The skill is not affiliated with, endorsed by, or sponsored by Amazon.
-Amazon, Amazon Ads, and related marks belong to Amazon.com, Inc.
+Это помощь в анализе, а не финансовый совет. Бенчмарки это усреднённые ориентиры
+из сторонних наборов данных; правильные цели определяются вашей маржой и стадией.
+Навык не связан с Amazon, не одобрен и не спонсируется им. Amazon, Amazon Ads и
+связанные знаки принадлежат Amazon.com, Inc.
 
-## License
+## Лицензия
 
-MIT. See [LICENSE](LICENSE).
+MIT. См. [LICENSE](LICENSE).
 
-Built by Oleg Gagarin. Site: [ggrn.pro](https://ggrn.pro).
+Автор: Олег Гагарин. Сайт: [ggrn.pro](https://ggrn.pro).
