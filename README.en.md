@@ -1,3 +1,5 @@
+![Amazon Ads Analyzer: from raw Amazon reports to a 0 to 100 HTML health report](assets/banner.png)
+
 # Amazon Ads Analyzer (ggrn-amz-ads-report)
 
 [Русская версия](README.md).

@@ -1,3 +1,5 @@
+![Amazon Ads Analyzer: из сырых отчётов Amazon в HTML-отчёт о здоровье рекламы с оценкой от 0 до 100](assets/banner.png)
+
 # Amazon Ads Analyzer (ggrn-amz-ads-report)
 
 [English version](README.en.md).
