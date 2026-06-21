@@ -16,9 +16,10 @@
 ваши кампании. Готовый отчёт не делает никаких сетевых запросов, поэтому его можно
 отправить клиенту, ничего никуда не утечёт.
 
-**Посмотреть демо-отчёт:** [открыть готовый пример](https://htmlpreview.github.io/?https://github.com/ggrnpro/ggrn-amz-ads-report/blob/main/examples/demo-report.html)
-(или сам файл: [`examples/demo-report.html`](examples/demo-report.html)). Это запуск
-одного товара на обезличенных данных.
+**Посмотреть демо-отчёт:** [открыть готовый пример](https://htmlpreview.github.io/?https://github.com/ggrnpro/ggrn-amz-ads-report/blob/main/examples/demo-report.ru.html)
+(или сам файл: [`examples/demo-report.ru.html`](examples/demo-report.ru.html)). Это запуск
+одного товара на обезличенных данных. Есть и
+[английская версия того же отчёта](https://htmlpreview.github.io/?https://github.com/ggrnpro/ggrn-amz-ads-report/blob/main/examples/demo-report.html).
 
 ## Что вы получаете
 

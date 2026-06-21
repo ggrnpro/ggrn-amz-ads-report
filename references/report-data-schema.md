@@ -19,6 +19,9 @@ exactly):
 ```jsonc
 {
   "meta": {                       // REQUIRED
+    "lang": "en",                 // "en" (default) or "ru". Switches the report's fixed UI strings
+                                  // (titles, help lines, table headers, legends). Write the data
+                                  // strings (summary, findings, hints, glossary) in that language too.
     "brand": "Acme Supplements",
     "marketplace": "Amazon.com (US)",
     "account_type": "Seller, Brand Registered",   // or "Vendor", "Seller (not brand-registered)"
@@ -56,7 +59,11 @@ exactly):
 
   "kpis": [                       // metric cards vs benchmark
     { "label": "ACOS", "value": "31%", "benchmark": "break-even 35%, target 28% or lower",
-      "status": "warning", "hint": "Optional one-liner shown under the card." }
+      "status": "warning", "hint": "Optional one-liner shown under the card.",
+      // Optional gauge: bar = where you are (0-100 position), mark = the target line (0-100),
+      // good = which side of the line is healthy ("left" for lower-is-better like ACOS/CPC,
+      // "right" for higher-is-better like ROAS/CTR/CVR), mark_label = the line's name on the legend.
+      "bar": 62, "mark": 70, "good": "left", "mark_label": "break-even" }
   ],
 
   "findings": [
@@ -85,6 +92,11 @@ exactly):
 
   "funnel": {
     "diagnosis": "Plain language: is this an ad problem or a listing problem, and why.",
+    // stages drive the centered funnel chart. Order them top (widest) to bottom.
+    // Widths use a log scale so even a tiny bottom stage stays a readable band, and
+    // the step % between stages is computed for you. value is a raw number.
+    "stages": [ { "label": "Impressions (wk)", "value": 14356 }, { "label": "Clicks", "value": 72 },
+                { "label": "Cart adds", "value": 21 }, { "label": "Purchases", "value": 4 } ],
     "rows": [ { "metric": "CTR", "value": "0.38%", "benchmark": "about 0.40%",
                 "read": "On benchmark, image and relevance are fine." } ]
   },

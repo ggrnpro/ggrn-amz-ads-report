@@ -17,7 +17,8 @@ can email it to a client without anything phoning home.
 
 **See a live demo report:** [open the rendered example](https://htmlpreview.github.io/?https://github.com/ggrnpro/ggrn-amz-ads-report/blob/main/examples/demo-report.html)
 (or the raw file: [`examples/demo-report.html`](examples/demo-report.html)). It is a
-single-product launch with anonymized sample data.
+single-product launch with anonymized sample data. A
+[Russian version of the same report](https://htmlpreview.github.io/?https://github.com/ggrnpro/ggrn-amz-ads-report/blob/main/examples/demo-report.ru.html) is also available.
 
 ## What you get
 

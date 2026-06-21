@@ -95,35 +95,55 @@
       "value": "70.6%",
       "benchmark": "assumed break-even about 40%",
       "status": "bad",
-      "hint": "You spend more on ads than the sale can carry. High is normal in a launch, but this is the number to drive down."
+      "hint": "You spend more on ads than the sale can carry. High is normal in a launch, but this is the number to drive down.",
+      "bar": 71,
+      "mark": 40,
+      "good": "left",
+      "mark_label": "break-even"
     },
     {
       "label": "ROAS",
       "value": "1.42x",
       "benchmark": "need about 2.5x to break even",
       "status": "bad",
-      "hint": "$1.42 back per $1 spent. The flip side of ACOS."
+      "hint": "$1.42 back per $1 spent. The flip side of ACOS.",
+      "bar": 28,
+      "mark": 50,
+      "good": "right",
+      "mark_label": "break-even"
     },
     {
       "label": "CPC",
       "value": "$2.44",
       "benchmark": "profitable is about $1.25",
       "status": "bad",
-      "hint": "You pay almost double what a $34.95 product at 9% conversion can afford. Biggest single lever after reviews."
+      "hint": "You pay almost double what a $34.95 product at 9% conversion can afford. Biggest single lever after reviews.",
+      "bar": 70,
+      "mark": 36,
+      "good": "left",
+      "mark_label": "profitable"
     },
     {
       "label": "CTR",
       "value": "0.35%",
       "benchmark": "healthy about 0.4 to 0.5%",
       "status": "warning",
-      "hint": "A bit low. Test a stronger main image and check your price."
+      "hint": "A bit low. Test a stronger main image and check your price.",
+      "bar": 44,
+      "mark": 56,
+      "good": "right",
+      "mark_label": "healthy"
     },
     {
       "label": "CVR (ads)",
       "value": "9.25%",
       "benchmark": "Home/Office 10 to 13%",
       "status": "warning",
-      "hint": "Listing search conversion is only 5.56%. People add to cart then leave. Reviews are the fix."
+      "hint": "Listing search conversion is only 5.56%. People add to cart then leave. Reviews are the fix.",
+      "bar": 62,
+      "mark": 80,
+      "good": "right",
+      "mark_label": "target"
     },
     {
       "label": "Ad spend",
@@ -350,6 +370,24 @@
         "value": "none visible",
         "benchmark": "aim 15+",
         "read": "Top priority. Enroll in Amazon Vine. This single change lifts every metric above."
+      }
+    ],
+    "stages": [
+      {
+        "label": "Impressions (wk)",
+        "value": 14356
+      },
+      {
+        "label": "Clicks",
+        "value": 72
+      },
+      {
+        "label": "Cart adds",
+        "value": 21
+      },
+      {
+        "label": "Purchases",
+        "value": 4
       }
     ]
   },
